@@ -342,23 +342,23 @@ public class GuardDB implements ClassConstants {
 					break;
 
 				case PACKAGE_MAP:
-					this.classTree.retainPackageMap(entry.name, entry.obfName);
+					this.classTree.retainPackageMap(entry.name, entry.obfName, false);
 					break;
 
 				case REPACKAGE_MAP:
-					this.classTree.retainRepackageMap(entry.name, entry.obfName);
+					this.classTree.retainRepackageMap(entry.name, entry.obfName, false);
 					break;
 
 				case CLASS_MAP:
-					this.classTree.retainClassMap(entry.name, entry.obfName);
+					this.classTree.retainClassMap(entry.name, entry.obfName, false);
 					break;
 
 				case METHOD_MAP:
-					this.classTree.retainMethodMap(entry.name, entry.descriptor, entry.obfName);
+					this.classTree.retainMethodMap(entry.name, entry.descriptor, entry.obfName, false);
 					break;
 
 				case FIELD_MAP:
-					this.classTree.retainFieldMap(entry.name, entry.obfName);
+					this.classTree.retainFieldMap(entry.name, entry.obfName, false);
 					break;
 
 				default:

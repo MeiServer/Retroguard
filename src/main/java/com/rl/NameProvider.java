@@ -599,7 +599,7 @@ public class NameProvider {
 				try {
 					if (NameProvider.multipass) {
 						md = (Md) classTree.retainMethodMap(mdEntry.obfName, mdEntry.obfDesc,
-								NameProvider.getShortName(mdEntry.deobfName));
+								NameProvider.getShortName(mdEntry.deobfName), true);
 					} else {
 						md = classTree.getMd(mdEntry.obfName, mdEntry.obfDesc);
 					}
@@ -618,7 +618,7 @@ public class NameProvider {
 				try {
 					if (NameProvider.multipass) {
 						fd = (Fd) classTree.retainFieldMap(fdEntry.obfName,
-								NameProvider.getShortName(fdEntry.deobfName));
+								NameProvider.getShortName(fdEntry.deobfName), true);
 					} else {
 						fd = classTree.getFd(fdEntry.obfName);
 					}
@@ -666,7 +666,7 @@ public class NameProvider {
 				try {
 					if (NameProvider.multipass) {
 						md = (Md) classTree.retainMethodMap(mdEntry.deobfName, mdEntry.deobfDesc,
-								NameProvider.getShortName(mdEntry.obfName));
+								NameProvider.getShortName(mdEntry.obfName), true);
 					} else {
 						md = classTree.getMd(mdEntry.deobfName, mdEntry.deobfDesc);
 					}
@@ -685,7 +685,7 @@ public class NameProvider {
 				try {
 					if (NameProvider.multipass) {
 						fd = (Fd) classTree.retainFieldMap(fdEntry.deobfName,
-								NameProvider.getShortName(fdEntry.obfName));
+								NameProvider.getShortName(fdEntry.obfName), true);
 					} else {
 						fd = classTree.getFd(fdEntry.deobfName);
 					}

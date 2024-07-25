@@ -401,32 +401,36 @@ public class ClassTree implements NameMapper, ClassConstants {
 
 	/**
 	 * Mark a package for retention, and specify its new name.
-	 * 
+	 *
 	 * @param name
 	 * @param obfName
+	 * @param doOverride
 	 * @throws ClassFileException
 	 */
-	public TreeItem retainPackageMap(String name, String obfName) throws ClassFileException {
-		Pk pk = this.getPk(name);
+	public TreeItem retainPackageMap(final String name, final String obfName, final boolean doOverride)
+			throws ClassFileException {
+		final Pk pk = this.getPk(name);
 		if (pk == null) {
 			throw new ClassFileException("PackageNotFound");
 		}
-		return ClassTree.retainItemMap(pk, obfName);
+		return ClassTree.retainItemMap(pk, obfName, doOverride);
 	}
 
 	/**
 	 * Mark a package for repackaging under this new name.
-	 * 
+	 *
 	 * @param name
 	 * @param obfName
+	 * @param doOverride
 	 * @throws ClassFileException
 	 */
-	public TreeItem retainRepackageMap(String name, String obfName) throws ClassFileException {
-		Pk pk = this.getPk(name);
+	public TreeItem retainRepackageMap(final String name, final String obfName, final boolean doOverride)
+			throws ClassFileException {
+		final Pk pk = this.getPk(name);
 		if (pk == null) {
 			throw new ClassFileException("PackageNotFound");
 		}
-		if (!pk.isFixed()) {
+		if (!pk.isFixed() || doOverride) {
 			pk.setRepackageName(obfName);
 			pk.setOutName(pk.getInName());
 		}
@@ -435,57 +439,68 @@ public class ClassTree implements NameMapper, ClassConstants {
 
 	/**
 	 * Mark a class/interface type for retention, and specify its new name.
-	 * 
+	 *
 	 * @param name
 	 * @param obfName
+	 * @param doOverride
 	 * @throws ClassFileException
 	 */
-	public TreeItem retainClassMap(String name, String obfName) throws ClassFileException {
-		Cl cl = this.getCl(name);
+	public TreeItem retainClassMap(final String name, final String obfName, final boolean doOverride)
+			throws ClassFileException {
+		final Cl cl = this.getCl(name);
 		if (cl == null) {
 			throw new ClassFileException("ClassNotFound");
 		}
-		return ClassTree.retainItemMap(cl, obfName);
+		return ClassTree.retainItemMap(cl, obfName, doOverride);
 	}
 
 	/**
 	 * Mark a method type for retention, and specify its new name.
-	 * 
+	 *
 	 * @param name
 	 * @param descriptor
 	 * @param obfName
+	 * @param doOverride
 	 * @throws ClassFileException
 	 */
-	public TreeItem retainMethodMap(String name, String descriptor, String obfName) throws ClassFileException {
-		Md md = this.getMd(name, descriptor);
+	public TreeItem retainMethodMap(final String name, final String descriptor, final String obfName,
+			final boolean doOverride) throws ClassFileException {
+		final Md md = this.getMd(name, descriptor);
 		if (md == null) {
 			throw new ClassFileException("MethodNotFound");
 		}
-		return ClassTree.retainItemMap(md, obfName);
+		return ClassTree.retainItemMap(md, obfName, doOverride);
 	}
 
 	/**
 	 * Mark a field type for retention, and specify its new name.
-	 * 
+	 *
 	 * @param name
 	 * @param obfName
+	 * @param doOverride
 	 * @throws ClassFileException
 	 */
-	public TreeItem retainFieldMap(String name, String obfName) throws ClassFileException {
-		Fd fd = this.getFd(name);
+	public TreeItem retainFieldMap(final String name, final String obfName, final boolean doOverride)
+			throws ClassFileException {
+		final Fd fd = this.getFd(name);
 		if (fd == null) {
 			throw new ClassFileException("FieldNotFound");
 		}
-		return ClassTree.retainItemMap(fd, obfName);
+		return ClassTree.retainItemMap(fd, obfName, doOverride);
 	}
 
 	/**
 	 * Mark an item for retention, and specify its new name.
-	 * 
+	 *
 	 * @param item
 	 * @param obfName
+	 * @param doOverride
 	 */
-	private static TreeItem retainItemMap(TreeItem item, String obfName) {
+	private static TreeItem retainItemMap(final TreeItem item, String obfName, final boolean doOverride) {
+		if (doOverride) {
+			item.clearFromScript();
+		}
+
 		if (item.isFixed()) {
 			if (obfName.equals("")) {
 				obfName = ".";
