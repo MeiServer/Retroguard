@@ -19,99 +19,89 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of an annotation's member-value-pair entry.
- * 
+ *
  * @author Mark Welsh
  */
-public class MemberValuePairInfo
-{
-    // Constants -------------------------------------------------------------
+public class MemberValuePairInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u2memberNameIndex;
+	private MemberValueInfo value;
 
-    // Fields ----------------------------------------------------------------
-    private int u2memberNameIndex;
-    private MemberValueInfo value;
+	// Class Methods ---------------------------------------------------------
+	/**
+	 * @param din
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	public static MemberValuePairInfo create(final DataInput din) throws IOException, ClassFileException {
+		final MemberValuePairInfo mvpi = new MemberValuePairInfo();
+		mvpi.read(din);
+		return mvpi;
+	}
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Private constructor
+	 */
+	private MemberValuePairInfo() {
+	}
 
-    // Class Methods ---------------------------------------------------------
-    /**
-     * @param din
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    public static MemberValuePairInfo create(DataInput din) throws IOException, ClassFileException
-    {
-        MemberValuePairInfo mvpi = new MemberValuePairInfo();
-        mvpi.read(din);
-        return mvpi;
-    }
+	/**
+	 * Return member name index into Constant Pool.
+	 */
+	protected int getMemberNameIndex() {
+		return this.u2memberNameIndex;
+	}
 
+	/**
+	 * Check for Utf8 references to constant pool and mark them.
+	 * 
+	 * @param pool
+	 * @throws ClassFileException
+	 */
+	protected void markUtf8Refs(final ConstantPool pool) throws ClassFileException {
+		pool.incRefCount(this.u2memberNameIndex);
+		this.value.markUtf8Refs(pool);
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Private constructor
-     */
-    private MemberValuePairInfo()
-    {
-    }
+	/**
+	 * @param din
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	private void read(final DataInput din) throws IOException, ClassFileException {
+		this.u2memberNameIndex = din.readUnsignedShort();
+		this.value = MemberValueInfo.create(din);
+	}
 
-    /**
-     * Return member name index into Constant Pool.
-     */
-    protected int getMemberNameIndex()
-    {
-        return this.u2memberNameIndex;
-    }
+	/**
+	 * Export the representation to a DataOutput stream.
+	 * 
+	 * @param dout
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	public void write(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeShort(this.u2memberNameIndex);
+		this.value.write(dout);
+	}
 
-    /**
-     * Check for Utf8 references to constant pool and mark them.
-     * 
-     * @param pool
-     * @throws ClassFileException
-     */
-    protected void markUtf8Refs(ConstantPool pool) throws ClassFileException
-    {
-        pool.incRefCount(this.u2memberNameIndex);
-        this.value.markUtf8Refs(pool);
-    }
-
-    /**
-     * @param din
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    private void read(DataInput din) throws IOException, ClassFileException
-    {
-        this.u2memberNameIndex = din.readUnsignedShort();
-        this.value = MemberValueInfo.create(din);
-    }
-
-    /**
-     * Export the representation to a DataOutput stream.
-     * 
-     * @param dout
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    public void write(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeShort(this.u2memberNameIndex);
-        this.value.write(dout);
-    }
-
-    /**
-     * Do necessary name remapping.
-     * 
-     * @param cf
-     * @param nm
-     * @throws ClassFileException
-     */
-    protected void remap(ClassFile cf, NameMapper nm) throws ClassFileException
-    {
-        this.value.remap(cf, nm);
-    }
+	/**
+	 * Do necessary name remapping.
+	 * 
+	 * @param cf
+	 * @param nm
+	 * @throws ClassFileException
+	 */
+	protected void remap(final ClassFile cf, final NameMapper nm) throws ClassFileException {
+		this.value.remap(cf, nm);
+	}
 }

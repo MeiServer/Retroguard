@@ -1,25 +1,20 @@
 package de.oceanlabs.mcp.retroguard.shadow.asm.signature;
 
-public class SignatureException extends Exception
-{
-    private static final long serialVersionUID = 1L;
+public class SignatureException extends Exception {
+	private static final long serialVersionUID = 1L;
 
-    public SignatureException()
-    {
-    }
+	public SignatureException() {
+	}
 
-    public SignatureException(String message)
-    {
-        super(message);
-    }
+	public SignatureException(final String message) {
+		super(message);
+	}
 
-    public SignatureException(Throwable cause)
-    {
-        super(cause);
-    }
+	public SignatureException(final Throwable cause) {
+		super(cause);
+	}
 
-    public SignatureException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+	public SignatureException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
 }

@@ -19,78 +19,70 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Representation of an attribute.
- * 
+ *
  * @author Mark Welsh
  */
-public class ExceptionsAttrInfo extends AttrInfo
-{
-    // Constants -------------------------------------------------------------
+public class ExceptionsAttrInfo extends AttrInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private ArrayList<Integer> u2exceptionIndexTable;
 
-    // Fields ----------------------------------------------------------------
-    private ArrayList<Integer> u2exceptionIndexTable;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param cf
+	 * @param attrNameIndex
+	 * @param attrLength
+	 */
+	protected ExceptionsAttrInfo(final ClassFile cf, final int attrNameIndex, final int attrLength) {
+		super(cf, attrNameIndex, attrLength);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Return the String name of the attribute; over-ride this in sub-classes.
+	 */
+	@Override
+	protected String getAttrName() {
+		return ClassConstants.ATTR_Exceptions;
+	}
 
+	/**
+	 * Read the data following the header.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		final int u2numberOfExceptions = din.readUnsignedShort();
+		this.u2exceptionIndexTable = new ArrayList<>(u2numberOfExceptions);
+		for (int i = 0; i < u2numberOfExceptions; i++) {
+			this.u2exceptionIndexTable.add(din.readUnsignedShort());
+		}
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param cf
-     * @param attrNameIndex
-     * @param attrLength
-     */
-    protected ExceptionsAttrInfo(ClassFile cf, int attrNameIndex, int attrLength)
-    {
-        super(cf, attrNameIndex, attrLength);
-    }
-
-    /**
-     * Return the String name of the attribute; over-ride this in sub-classes.
-     */
-    @Override
-    protected String getAttrName()
-    {
-        return ClassConstants.ATTR_Exceptions;
-    }
-
-    /**
-     * Read the data following the header.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        int u2numberOfExceptions = din.readUnsignedShort();
-        this.u2exceptionIndexTable = new ArrayList<Integer>(u2numberOfExceptions);
-        for (int i = 0; i < u2numberOfExceptions; i++)
-        {
-            this.u2exceptionIndexTable.add(din.readUnsignedShort());
-        }
-    }
-
-    /**
-     * Export data following the header to a DataOutput stream.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    public void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeShort(this.u2exceptionIndexTable.size());
-        for (int ex : this.u2exceptionIndexTable)
-        {
-            dout.writeShort(ex);
-        }
-    }
+	/**
+	 * Export data following the header to a DataOutput stream.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	public void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeShort(this.u2exceptionIndexTable.size());
+		for (final int ex : this.u2exceptionIndexTable) {
+			dout.writeShort(ex);
+		}
+	}
 }

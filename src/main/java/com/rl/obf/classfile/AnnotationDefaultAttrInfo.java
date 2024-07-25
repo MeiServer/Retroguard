@@ -19,99 +19,90 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of an attribute.
- * 
+ *
  * @author Mark Welsh
  */
-public class AnnotationDefaultAttrInfo extends AttrInfo
-{
-    // Constants -------------------------------------------------------------
+public class AnnotationDefaultAttrInfo extends AttrInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private MemberValueInfo defaultValue;
 
-    // Fields ----------------------------------------------------------------
-    private MemberValueInfo defaultValue;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param cf
+	 * @param attrNameIndex
+	 * @param attrLength
+	 */
+	protected AnnotationDefaultAttrInfo(final ClassFile cf, final int attrNameIndex, final int attrLength) {
+		super(cf, attrNameIndex, attrLength);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Return the String name of the attribute.
+	 */
+	@Override
+	protected String getAttrName() {
+		return ClassConstants.ATTR_AnnotationDefault;
+	}
 
+	/**
+	 * Return the default value.
+	 */
+	protected MemberValueInfo getDefaultValue() {
+		return this.defaultValue;
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param cf
-     * @param attrNameIndex
-     * @param attrLength
-     */
-    protected AnnotationDefaultAttrInfo(ClassFile cf, int attrNameIndex, int attrLength)
-    {
-        super(cf, attrNameIndex, attrLength);
-    }
+	/**
+	 * Check for Utf8 references in the 'info' data to the constant pool and mark
+	 * them.
+	 * 
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void markUtf8RefsInInfo(final ConstantPool pool) throws ClassFileException {
+		this.defaultValue.markUtf8Refs(pool);
+	}
 
-    /**
-     * Return the String name of the attribute.
-     */
-    @Override
-    protected String getAttrName()
-    {
-        return ClassConstants.ATTR_AnnotationDefault;
-    }
+	/**
+	 * Read the data following the header.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		this.defaultValue = MemberValueInfo.create(din);
+	}
 
-    /**
-     * Return the default value.
-     */
-    protected MemberValueInfo getDefaultValue()
-    {
-        return this.defaultValue;
-    }
+	/**
+	 * Export data following the header to a DataOutput stream.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	public void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		this.defaultValue.write(dout);
+	}
 
-    /**
-     * Check for Utf8 references in the 'info' data to the constant pool and mark them.
-     * 
-     * @throws ClassFileException
-     */
-    @Override
-    protected void markUtf8RefsInInfo(ConstantPool pool) throws ClassFileException
-    {
-        this.defaultValue.markUtf8Refs(pool);
-    }
-
-    /**
-     * Read the data following the header.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        this.defaultValue = MemberValueInfo.create(din);
-    }
-
-    /**
-     * Export data following the header to a DataOutput stream.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    public void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        this.defaultValue.write(dout);
-    }
-
-    /**
-     * Do necessary name remapping.
-     * 
-     * @throws ClassFileException
-     */
-    @Override
-    protected void remap(ClassFile cf, NameMapper nm) throws ClassFileException
-    {
-        this.defaultValue.remap(cf, nm);
-    }
+	/**
+	 * Do necessary name remapping.
+	 * 
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void remap(final ClassFile cf, final NameMapper nm) throws ClassFileException {
+		this.defaultValue.remap(cf, nm);
+	}
 }

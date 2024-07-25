@@ -19,60 +19,51 @@
 
 package com.rl.obf;
 
-import java.io.*;
-import java.util.*;
-
 import com.rl.obf.classfile.ClassFileException;
 
 /**
  * Set of actions to be performed by a tree walker
- * 
+ *
  * @author Mark Welsh
  */
-public class TreeAction
-{
-    /**
-     * @param pk
-     * @throws ClassFileException
-     */
-    public void packageAction(Pk pk) throws ClassFileException
-    {
-        this.defaultAction(pk);
-    }
+public class TreeAction {
+	/**
+	 * @param pk
+	 * @throws ClassFileException
+	 */
+	public void packageAction(final Pk pk) throws ClassFileException {
+		this.defaultAction(pk);
+	}
 
-    /**
-     * @param cl
-     * @throws ClassFileException
-     */
-    public void classAction(Cl cl) throws ClassFileException
-    {
-        this.defaultAction(cl);
-    }
+	/**
+	 * @param cl
+	 * @throws ClassFileException
+	 */
+	public void classAction(final Cl cl) throws ClassFileException {
+		this.defaultAction(cl);
+	}
 
-    /**
-     * @param md
-     * @throws ClassFileException
-     */
-    public void methodAction(Md md) throws ClassFileException
-    {
-        this.defaultAction(md);
-    }
+	/**
+	 * @param md
+	 * @throws ClassFileException
+	 */
+	public void methodAction(final Md md) throws ClassFileException {
+		this.defaultAction(md);
+	}
 
-    /**
-     * @param fd
-     * @throws ClassFileException
-     */
-    public void fieldAction(Fd fd) throws ClassFileException
-    {
-        this.defaultAction(fd);
-    }
+	/**
+	 * @param fd
+	 * @throws ClassFileException
+	 */
+	public void fieldAction(final Fd fd) throws ClassFileException {
+		this.defaultAction(fd);
+	}
 
-    /**
-     * @param ti
-     * @throws ClassFileException
-     */
-    public void defaultAction(TreeItem ti) throws ClassFileException
-    {
-        // do nothing
-    }
+	/**
+	 * @param ti
+	 * @throws ClassFileException
+	 */
+	public void defaultAction(final TreeItem ti) throws ClassFileException {
+		// do nothing
+	}
 }

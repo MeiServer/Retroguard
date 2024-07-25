@@ -19,85 +19,76 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of a 'string' entry in the ConstantPool.
- * 
+ *
  * @author Mark Welsh
  */
-public class StringCpInfo extends CpInfo
-{
-    // Constants -------------------------------------------------------------
+public class StringCpInfo extends CpInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u2stringIndex;
 
-    // Fields ----------------------------------------------------------------
-    private int u2stringIndex;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 */
+	protected StringCpInfo() {
+		super(ClassConstants.CONSTANT_String);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Return the string index.
+	 */
+	protected int getStringIndex() {
+		return this.u2stringIndex;
+	}
 
+	/**
+	 * Set the string index.
+	 * 
+	 * @param index
+	 */
+	protected void setStringIndex(final int index) {
+		this.u2stringIndex = index;
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     */
-    protected StringCpInfo()
-    {
-        super(ClassConstants.CONSTANT_String);
-    }
+	/**
+	 * Check for Utf8 references to constant pool and mark them.
+	 * 
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void markUtf8Refs(final ConstantPool pool) throws ClassFileException {
+		pool.incRefCount(this.u2stringIndex);
+	}
 
-    /**
-     * Return the string index.
-     */
-    protected int getStringIndex()
-    {
-        return this.u2stringIndex;
-    }
+	/**
+	 * Read the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		this.u2stringIndex = din.readUnsignedShort();
+	}
 
-    /**
-     * Set the string index.
-     * 
-     * @param index
-     */
-    protected void setStringIndex(int index)
-    {
-        this.u2stringIndex = index;
-    }
-
-    /**
-     * Check for Utf8 references to constant pool and mark them.
-     * 
-     * @throws ClassFileException
-     */
-    @Override
-    protected void markUtf8Refs(ConstantPool pool) throws ClassFileException
-    {
-        pool.incRefCount(this.u2stringIndex);
-    }
-
-    /**
-     * Read the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        this.u2stringIndex = din.readUnsignedShort();
-    }
-
-    /**
-     * Write the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeShort(this.u2stringIndex);
-    }
+	/**
+	 * Write the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeShort(this.u2stringIndex);
+	}
 }

@@ -19,53 +19,44 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.util.HashMap;
 
 /**
  * Subclass of HashMap used for storing flags while walking Code.
- * 
+ *
  * @author Mark Welsh
  */
-public class FlagHashtable extends HashMap<CpInfo, StringCpInfoFlags>
-{
-    private static final long serialVersionUID = 1L;
+public class FlagHashtable extends HashMap<CpInfo, StringCpInfoFlags> {
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * @param cpInfo
-     * @param index
-     * @param forNameFlag
-     */
-    public void updateFlag(CpInfo cpInfo, int index, boolean forNameFlag)
-    {
-        StringCpInfoFlags flags = this.get(cpInfo);
-        if (flags == null)
-        {
-            flags = new StringCpInfoFlags();
-            flags.stringIndex = index;
-            this.put(cpInfo, flags);
-        }
-        if (forNameFlag)
-        {
-            flags.forNameFlag = true;
-        }
-        else
-        {
-            flags.otherFlag = true;
-        }
-    }
+	/**
+	 * @param cpInfo
+	 * @param index
+	 * @param forNameFlag
+	 */
+	public void updateFlag(final CpInfo cpInfo, final int index, final boolean forNameFlag) {
+		StringCpInfoFlags flags = this.get(cpInfo);
+		if (flags == null) {
+			flags = new StringCpInfoFlags();
+			flags.stringIndex = index;
+			this.put(cpInfo, flags);
+		}
+		if (forNameFlag) {
+			flags.forNameFlag = true;
+		} else {
+			flags.otherFlag = true;
+		}
+	}
 }
 
-class StringCpInfoFlags
-{
-    protected int stringIndex;
-    protected boolean forNameFlag;
-    protected boolean otherFlag;
+class StringCpInfoFlags {
+	protected int stringIndex;
+	protected boolean forNameFlag;
+	protected boolean otherFlag;
 
-    /**
-     * Constructor
-     */
-    protected StringCpInfoFlags()
-    {
-    }
+	/**
+	 * Constructor
+	 */
+	protected StringCpInfoFlags() {
+	}
 }

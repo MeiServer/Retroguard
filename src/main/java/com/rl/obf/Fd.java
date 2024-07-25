@@ -19,42 +19,33 @@
 
 package com.rl.obf;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
-
-import com.rl.obf.classfile.*;
-import com.rl.util.*;
+import com.rl.obf.classfile.ClassFileException;
 
 /**
  * Tree item representing a field.
- * 
+ *
  * @author Mark Welsh
  */
-public class Fd extends MdFd
-{
-    // Constants -------------------------------------------------------------
+public class Fd extends MdFd {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
 
-    // Fields ----------------------------------------------------------------
+	// Class Methods ---------------------------------------------------------
 
-
-    // Class Methods ---------------------------------------------------------
-
-
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param parent
-     * @param isSynthetic
-     * @param name
-     * @param descriptor
-     * @param access
-     * @throws ClassFileException
-     */
-    public Fd(TreeItem parent, boolean isSynthetic, String name, String descriptor, int access) throws ClassFileException
-    {
-        super(parent, isSynthetic, name, descriptor, access);
-    }
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param parent
+	 * @param isSynthetic
+	 * @param name
+	 * @param descriptor
+	 * @param access
+	 * @throws ClassFileException
+	 */
+	public Fd(final TreeItem parent, final boolean isSynthetic, final String name, final String descriptor,
+			final int access) throws ClassFileException {
+		super(parent, isSynthetic, name, descriptor, access);
+	}
 }

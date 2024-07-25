@@ -19,97 +19,88 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Representation of an attribute.
- * 
+ *
  * @author Mark Welsh
  */
-abstract public class ParameterAnnotationsAttrInfo extends AttrInfo
-{
-    // Constants -------------------------------------------------------------
+abstract public class ParameterAnnotationsAttrInfo extends AttrInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private List<ParameterAnnotationsInfo> parameterAnnotationsTable;
 
-    // Fields ----------------------------------------------------------------
-    private List<ParameterAnnotationsInfo> parameterAnnotationsTable;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param cf
+	 * @param attrNameIndex
+	 * @param attrLength
+	 */
+	protected ParameterAnnotationsAttrInfo(final ClassFile cf, final int attrNameIndex, final int attrLength) {
+		super(cf, attrNameIndex, attrLength);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Check for Utf8 references in the 'info' data to the constant pool and mark
+	 * them.
+	 * 
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void markUtf8RefsInInfo(final ConstantPool pool) throws ClassFileException {
+		for (final ParameterAnnotationsInfo pa : this.parameterAnnotationsTable) {
+			pa.markUtf8Refs(pool);
+		}
+	}
 
+	/**
+	 * Read the data following the header.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		final int u1numParameters = din.readUnsignedByte();
+		this.parameterAnnotationsTable = new ArrayList<>(u1numParameters);
+		for (int i = 0; i < u1numParameters; i++) {
+			this.parameterAnnotationsTable.add(ParameterAnnotationsInfo.create(din));
+		}
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param cf
-     * @param attrNameIndex
-     * @param attrLength
-     */
-    protected ParameterAnnotationsAttrInfo(ClassFile cf, int attrNameIndex, int attrLength)
-    {
-        super(cf, attrNameIndex, attrLength);
-    }
+	/**
+	 * Export data following the header to a DataOutput stream.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	public void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeByte(this.parameterAnnotationsTable.size());
+		for (final ParameterAnnotationsInfo pa : this.parameterAnnotationsTable) {
+			pa.write(dout);
+		}
+	}
 
-    /**
-     * Check for Utf8 references in the 'info' data to the constant pool and mark them.
-     * 
-     * @throws ClassFileException
-     */
-    @Override
-    protected void markUtf8RefsInInfo(ConstantPool pool) throws ClassFileException
-    {
-        for (ParameterAnnotationsInfo pa : this.parameterAnnotationsTable)
-        {
-            pa.markUtf8Refs(pool);
-        }
-    }
-
-    /**
-     * Read the data following the header.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        int u1numParameters = din.readUnsignedByte();
-        this.parameterAnnotationsTable = new ArrayList<ParameterAnnotationsInfo>(u1numParameters);
-        for (int i = 0; i < u1numParameters; i++)
-        {
-            this.parameterAnnotationsTable.add(ParameterAnnotationsInfo.create(din));
-        }
-    }
-
-    /**
-     * Export data following the header to a DataOutput stream.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    public void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeByte(this.parameterAnnotationsTable.size());
-        for (ParameterAnnotationsInfo pa : this.parameterAnnotationsTable)
-        {
-            pa.write(dout);
-        }
-    }
-
-    /**
-     * Do necessary name remapping.
-     * 
-     * @throws ClassFileException
-     */
-    @Override
-    protected void remap(ClassFile cf, NameMapper nm) throws ClassFileException
-    {
-        for (ParameterAnnotationsInfo pa : this.parameterAnnotationsTable)
-        {
-            pa.remap(cf, nm);
-        }
-    }
+	/**
+	 * Do necessary name remapping.
+	 * 
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void remap(final ClassFile cf, final NameMapper nm) throws ClassFileException {
+		for (final ParameterAnnotationsInfo pa : this.parameterAnnotationsTable) {
+			pa.remap(cf, nm);
+		}
+	}
 }

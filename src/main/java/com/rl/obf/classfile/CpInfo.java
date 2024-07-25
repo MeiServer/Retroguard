@@ -19,200 +19,188 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
- * Representation of an entry in the ConstantPool. Specific types of entry have their representations sub-classed from this.
- * 
+ * Representation of an entry in the ConstantPool. Specific types of entry have
+ * their representations sub-classed from this.
+ *
  * @author Mark Welsh
  */
-abstract public class CpInfo implements ClassConstants
-{
-    // Constants -------------------------------------------------------------
+abstract public class CpInfo implements ClassConstants {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private final int u1tag;
 
-    // Fields ----------------------------------------------------------------
-    private int u1tag;
+	/**
+	 * Used for reference counting in Constant Pool
+	 */
+	protected int refCount = 0;
 
-    /**
-     * Used for reference counting in Constant Pool
-     */
-    protected int refCount = 0;
+	// Class Methods ---------------------------------------------------------
+	/**
+	 * Create a new CpInfo from the data passed.
+	 * 
+	 * @param din
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	public static CpInfo create(final DataInput din) throws IOException, ClassFileException {
+		if (din == null) {
+			throw new IOException("No input stream was provided.");
+		}
 
+		// Instantiate based on tag byte
+		CpInfo ci = null;
+		switch (din.readUnsignedByte()) {
+		case CONSTANT_Utf8:
+			ci = new Utf8CpInfo();
+			break;
+		case CONSTANT_Integer:
+			ci = new IntegerCpInfo();
+			break;
+		case CONSTANT_Float:
+			ci = new FloatCpInfo();
+			break;
+		case CONSTANT_Long:
+			ci = new LongCpInfo();
+			break;
+		case CONSTANT_Double:
+			ci = new DoubleCpInfo();
+			break;
+		case CONSTANT_Class:
+			ci = new ClassCpInfo();
+			break;
+		case CONSTANT_String:
+			ci = new StringCpInfo();
+			break;
+		case CONSTANT_Fieldref:
+			ci = new FieldrefCpInfo();
+			break;
+		case CONSTANT_Methodref:
+			ci = new MethodrefCpInfo();
+			break;
+		case CONSTANT_InterfaceMethodref:
+			ci = new InterfaceMethodrefCpInfo();
+			break;
+		case CONSTANT_NameAndType:
+			ci = new NameAndTypeCpInfo();
+			break;
+		case CONSTANT_MethodHandle:
+			ci = new MethodHandleCpInfo();
+			break;
+		case CONSTANT_MethodType:
+			ci = new MethodTypeCpInfo();
+			break;
+		case CONSTANT_InvokeDynamic:
+			ci = new InvokeDynamicCpInfo();
+			break;
+		default:
+			throw new ClassFileException("Unknown tag type in constant pool.");
+		}
+		ci.readInfo(din);
+		return ci;
+	}
 
-    // Class Methods ---------------------------------------------------------
-    /**
-     * Create a new CpInfo from the data passed.
-     * 
-     * @param din
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    public static CpInfo create(DataInput din) throws IOException, ClassFileException
-    {
-        if (din == null)
-        {
-            throw new IOException("No input stream was provided.");
-        }
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param tag
+	 */
+	protected CpInfo(final int tag) {
+		this.u1tag = tag;
+	}
 
-        // Instantiate based on tag byte
-        CpInfo ci = null;
-        switch (din.readUnsignedByte())
-        {
-            case CONSTANT_Utf8:
-                ci = new Utf8CpInfo();
-                break;
-            case CONSTANT_Integer:
-                ci = new IntegerCpInfo();
-                break;
-            case CONSTANT_Float:
-                ci = new FloatCpInfo();
-                break;
-            case CONSTANT_Long:
-                ci = new LongCpInfo();
-                break;
-            case CONSTANT_Double:
-                ci = new DoubleCpInfo();
-                break;
-            case CONSTANT_Class:
-                ci = new ClassCpInfo();
-                break;
-            case CONSTANT_String:
-                ci = new StringCpInfo();
-                break;
-            case CONSTANT_Fieldref:
-                ci = new FieldrefCpInfo();
-                break;
-            case CONSTANT_Methodref:
-                ci = new MethodrefCpInfo();
-                break;
-            case CONSTANT_InterfaceMethodref:
-                ci = new InterfaceMethodrefCpInfo();
-                break;
-            case CONSTANT_NameAndType:
-                ci = new NameAndTypeCpInfo();
-                break;
-            case CONSTANT_MethodHandle:
-                ci = new MethodHandleCpInfo();
-                break;
-            case CONSTANT_MethodType:
-                ci = new MethodTypeCpInfo();
-                break;
-            case CONSTANT_InvokeDynamic:
-                ci = new InvokeDynamicCpInfo();
-                break;
-            default:
-                throw new ClassFileException("Unknown tag type in constant pool.");
-        }
-        ci.readInfo(din);
-        return ci;
-    }
+	/**
+	 * Read the 'info' data following the u1tag byte; over-ride this in sub-classes.
+	 * 
+	 * @param din
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	abstract protected void readInfo(DataInput din) throws IOException, ClassFileException;
 
+	/**
+	 * Check for Utf8 references to constant pool and mark them; over-ride this in
+	 * sub-classes.
+	 * 
+	 * @param pool
+	 * @throws ClassFileException
+	 */
+	protected void markUtf8Refs(final ConstantPool pool) throws ClassFileException {
+		// do nothing
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param tag
-     */
-    protected CpInfo(int tag)
-    {
-        this.u1tag = tag;
-    }
+	/**
+	 * Check for NameAndType references to constant pool and mark them; over-ride
+	 * this in sub-classes.
+	 * 
+	 * @param pool
+	 * @throws ClassFileException
+	 */
+	protected void markNTRefs(final ConstantPool pool) throws ClassFileException {
+		// do nothing
+	}
 
-    /**
-     * Read the 'info' data following the u1tag byte; over-ride this in sub-classes.
-     * 
-     * @param din
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    abstract protected void readInfo(DataInput din) throws IOException, ClassFileException;
+	/**
+	 * Export the representation to a {@code DataOutput} stream.
+	 * 
+	 * @param dout
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	public void write(final DataOutput dout) throws IOException, ClassFileException {
+		if (dout == null) {
+			throw new IOException("No output stream was provided.");
+		}
+		dout.writeByte(this.u1tag);
+		this.writeInfo(dout);
+	}
 
-    /**
-     * Check for Utf8 references to constant pool and mark them; over-ride this in sub-classes.
-     * 
-     * @param pool
-     * @throws ClassFileException
-     */
-    protected void markUtf8Refs(ConstantPool pool) throws ClassFileException
-    {
-        // do nothing
-    }
+	/**
+	 * Write the 'info' data following the u1tag byte; over-ride this in
+	 * sub-classes.
+	 * 
+	 * @param dout
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	abstract protected void writeInfo(DataOutput dout) throws IOException, ClassFileException;
 
-    /**
-     * Check for NameAndType references to constant pool and mark them; over-ride this in sub-classes.
-     * 
-     * @param pool
-     * @throws ClassFileException
-     */
-    protected void markNTRefs(ConstantPool pool) throws ClassFileException
-    {
-        // do nothing
-    }
+	/**
+	 * Return the reference count.
+	 */
+	public int getRefCount() {
+		return this.refCount;
+	}
 
-    /**
-     * Export the representation to a {@code DataOutput} stream.
-     * 
-     * @param dout
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    public void write(DataOutput dout) throws IOException, ClassFileException
-    {
-        if (dout == null)
-        {
-            throw new IOException("No output stream was provided.");
-        }
-        dout.writeByte(this.u1tag);
-        this.writeInfo(dout);
-    }
+	/**
+	 * Increment the reference count.
+	 */
+	public void incRefCount() {
+		this.refCount++;
+	}
 
-    /**
-     * Write the 'info' data following the u1tag byte; over-ride this in sub-classes.
-     * 
-     * @param dout
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    abstract protected void writeInfo(DataOutput dout) throws IOException, ClassFileException;
+	/**
+	 * Decrement the reference count.
+	 * 
+	 * @throws ClassFileException
+	 */
+	public void decRefCount() throws ClassFileException {
+		if (this.refCount == 0) {
+			throw new ClassFileException("Illegal to decrement ref count that is already zero.");
+		}
+		this.refCount--;
+	}
 
-    /**
-     * Return the reference count.
-     */
-    public int getRefCount()
-    {
-        return this.refCount;
-    }
-
-    /**
-     * Increment the reference count.
-     */
-    public void incRefCount()
-    {
-        this.refCount++;
-    }
-
-    /**
-     * Decrement the reference count.
-     * 
-     * @throws ClassFileException
-     */
-    public void decRefCount() throws ClassFileException
-    {
-        if (this.refCount == 0)
-        {
-            throw new ClassFileException("Illegal to decrement ref count that is already zero.");
-        }
-        this.refCount--;
-    }
-
-    /**
-     * Reset the reference count to zero.
-     */
-    public void resetRefCount()
-    {
-        this.refCount = 0;
-    }
+	/**
+	 * Reset the reference count to zero.
+	 */
+	public void resetRefCount() {
+		this.refCount = 0;
+	}
 }

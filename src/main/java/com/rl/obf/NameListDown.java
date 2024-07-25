@@ -22,29 +22,28 @@ package com.rl.obf;
 import com.rl.obf.classfile.ClassFileException;
 
 /**
- * Interface to a list of method and field names and descriptors -- used for checking if a name/descriptor is reserved through a
- * derived class/interface.
- * 
+ * Interface to a list of method and field names and descriptors -- used for
+ * checking if a name/descriptor is reserved through a derived class/interface.
+ *
  * @author Mark Welsh
  */
-public interface NameListDown
-{
-    /**
-     * Is the method reserved because of its reservation down the class hierarchy?
-     * 
-     * @param caller
-     * @param name
-     * @param descriptor
-     * @throws ClassFileException
-     */
-    public String getMethodObfNameDown(Cl caller, String name, String descriptor) throws ClassFileException;
+public interface NameListDown {
+	/**
+	 * Is the method reserved because of its reservation down the class hierarchy?
+	 * 
+	 * @param caller
+	 * @param name
+	 * @param descriptor
+	 * @throws ClassFileException
+	 */
+	public String getMethodObfNameDown(Cl caller, String name, String descriptor) throws ClassFileException;
 
-    /**
-     * Is the field reserved because of its reservation down the class hierarchy?
-     * 
-     * @param caller
-     * @param name
-     * @throws ClassFileException
-     */
-    public String getFieldObfNameDown(Cl caller, String name) throws ClassFileException;
+	/**
+	 * Is the field reserved because of its reservation down the class hierarchy?
+	 * 
+	 * @param caller
+	 * @param name
+	 * @throws ClassFileException
+	 */
+	public String getFieldObfNameDown(Cl caller, String name) throws ClassFileException;
 }

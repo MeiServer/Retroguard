@@ -19,59 +19,51 @@
 
 package com.rl.obf;
 
-import java.io.*;
-import java.util.*;
-
 /**
  * Representation of RGS script files entry.
- * 
+ *
  * @author Mark Welsh
  */
-public class RgsEntry
-{
-    // Constants -------------------------------------------------------------
+public class RgsEntry {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	public RgsEntryType type;
+	public String name;
+	public String descriptor;
+	public String extendsName;
+	public String obfName;
+	public boolean retainToPublic;
+	public boolean retainToProtected;
+	public boolean retainPubProtOnly;
+	public boolean retainFieldsOnly;
+	public boolean retainMethodsOnly;
+	public boolean retainAndClass;
+	public int accessMask;
+	public int accessSetting;
 
-    // Fields ----------------------------------------------------------------
-    public RgsEntryType type;
-    public String name;
-    public String descriptor;
-    public String extendsName;
-    public String obfName;
-    public boolean retainToPublic;
-    public boolean retainToProtected;
-    public boolean retainPubProtOnly;
-    public boolean retainFieldsOnly;
-    public boolean retainMethodsOnly;
-    public boolean retainAndClass;
-    public int accessMask;
-    public int accessSetting;
+	// Instance Methods-------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param type
+	 * @param name
+	 */
+	public RgsEntry(final RgsEntryType type, final String name) {
+		this.type = type;
+		this.name = name;
+	}
 
-
-    // Instance Methods-------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param type
-     * @param name
-     */
-    public RgsEntry(RgsEntryType type, String name)
-    {
-        this.type = type;
-        this.name = name;
-    }
-
-    /**
-     * Constructor
-     * 
-     * @param type
-     * @param name
-     * @param descriptor
-     */
-    public RgsEntry(RgsEntryType type, String name, String descriptor)
-    {
-        this.type = type;
-        this.name = name;
-        this.descriptor = descriptor;
-    }
+	/**
+	 * Constructor
+	 * 
+	 * @param type
+	 * @param name
+	 * @param descriptor
+	 */
+	public RgsEntry(final RgsEntryType type, final String name, final String descriptor) {
+		this.type = type;
+		this.name = name;
+		this.descriptor = descriptor;
+	}
 }

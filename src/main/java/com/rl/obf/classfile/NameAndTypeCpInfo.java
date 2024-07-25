@@ -19,120 +19,108 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of a 'nameandtype' entry in the ConstantPool.
- * 
+ *
  * @author Mark Welsh
  */
-public class NameAndTypeCpInfo extends CpInfo implements Cloneable
-{
-    // Constants -------------------------------------------------------------
+public class NameAndTypeCpInfo extends CpInfo implements Cloneable {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u2nameIndex;
+	private int u2descriptorIndex;
 
-    // Fields ----------------------------------------------------------------
-    private int u2nameIndex;
-    private int u2descriptorIndex;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 */
+	protected NameAndTypeCpInfo() {
+		super(ClassConstants.CONSTANT_NameAndType);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Clone the entry.
+	 */
+	@Override
+	public Object clone() {
+		final NameAndTypeCpInfo cloneInfo = new NameAndTypeCpInfo();
+		cloneInfo.u2nameIndex = this.u2nameIndex;
+		cloneInfo.u2descriptorIndex = this.u2descriptorIndex;
+		cloneInfo.resetRefCount();
+		return cloneInfo;
+	}
 
+	/**
+	 * Return the name index.
+	 */
+	protected int getNameIndex() {
+		return this.u2nameIndex;
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     */
-    protected NameAndTypeCpInfo()
-    {
-        super(ClassConstants.CONSTANT_NameAndType);
-    }
+	/**
+	 * Set the name index.
+	 * 
+	 * @param index
+	 */
+	protected void setNameIndex(final int index) {
+		this.u2nameIndex = index;
+	}
 
-    /**
-     * Clone the entry.
-     */
-    @Override
-    public Object clone()
-    {
-        NameAndTypeCpInfo cloneInfo = new NameAndTypeCpInfo();
-        cloneInfo.u2nameIndex = this.u2nameIndex;
-        cloneInfo.u2descriptorIndex = this.u2descriptorIndex;
-        cloneInfo.resetRefCount();
-        return cloneInfo;
-    }
+	/**
+	 * Return the descriptor index.
+	 */
+	protected int getDescriptorIndex() {
+		return this.u2descriptorIndex;
+	}
 
-    /**
-     * Return the name index.
-     */
-    protected int getNameIndex()
-    {
-        return this.u2nameIndex;
-    }
+	/**
+	 * Set the descriptor index.
+	 * 
+	 * @param index
+	 */
+	protected void setDescriptorIndex(final int index) {
+		this.u2descriptorIndex = index;
+	}
 
-    /**
-     * Set the name index.
-     * 
-     * @param index
-     */
-    protected void setNameIndex(int index)
-    {
-        this.u2nameIndex = index;
-    }
+	/**
+	 * Check for Utf8 references to constant pool and mark them.
+	 * 
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void markUtf8Refs(final ConstantPool pool) throws ClassFileException {
+		pool.incRefCount(this.u2nameIndex);
+		pool.incRefCount(this.u2descriptorIndex);
+	}
 
-    /**
-     * Return the descriptor index.
-     */
-    protected int getDescriptorIndex()
-    {
-        return this.u2descriptorIndex;
-    }
+	/**
+	 * Read the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		this.u2nameIndex = din.readUnsignedShort();
+		this.u2descriptorIndex = din.readUnsignedShort();
+	}
 
-    /**
-     * Set the descriptor index.
-     * 
-     * @param index
-     */
-    protected void setDescriptorIndex(int index)
-    {
-        this.u2descriptorIndex = index;
-    }
-
-    /**
-     * Check for Utf8 references to constant pool and mark them.
-     * 
-     * @throws ClassFileException
-     */
-    @Override
-    protected void markUtf8Refs(ConstantPool pool) throws ClassFileException
-    {
-        pool.incRefCount(this.u2nameIndex);
-        pool.incRefCount(this.u2descriptorIndex);
-    }
-
-    /**
-     * Read the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        this.u2nameIndex = din.readUnsignedShort();
-        this.u2descriptorIndex = din.readUnsignedShort();
-    }
-
-    /**
-     * Write the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeShort(this.u2nameIndex);
-        dout.writeShort(this.u2descriptorIndex);
-    }
+	/**
+	 * Write the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeShort(this.u2nameIndex);
+		dout.writeShort(this.u2descriptorIndex);
+	}
 }

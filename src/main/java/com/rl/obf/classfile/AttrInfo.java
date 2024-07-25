@@ -19,261 +19,207 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.List;
 
 /**
- * Representation of an attribute. Specific attributes have their representations sub-classed from this.
- * 
+ * Representation of an attribute. Specific attributes have their
+ * representations sub-classed from this.
+ *
  * @author Mark Welsh
  */
-public class AttrInfo implements ClassConstants
-{
-    // Constants -------------------------------------------------------------
-    public static final int CONSTANT_FIELD_SIZE = 6;
+public class AttrInfo implements ClassConstants {
+	// Constants -------------------------------------------------------------
+	public static final int CONSTANT_FIELD_SIZE = 6;
 
+	// Fields ----------------------------------------------------------------
+	private final int u2attrNameIndex;
+	private final int u4attrLength;
+	private byte info[];
+	protected AttrSource source;
 
-    // Fields ----------------------------------------------------------------
-    private int u2attrNameIndex;
-    private int u4attrLength;
-    private byte info[];
-    protected AttrSource source;
+	protected ClassFile cf;
 
-    protected ClassFile cf;
+	// Class Methods ---------------------------------------------------------
+	/**
+	 * Create a new AttrInfo from the data passed.
+	 * 
+	 * @param din
+	 * @param cf
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	public static AttrInfo create(final DataInput din, final ClassFile cf, final AttrSource source)
+			throws IOException, ClassFileException {
+		if (din == null) {
+			throw new IOException("No input stream was provided.");
+		}
 
+		// Instantiate based on attribute name
+		AttrInfo ai = null;
+		final int attrNameIndex = din.readUnsignedShort();
+		final int attrLength = din.readInt();
+		final String attrName = cf.getUtf8(attrNameIndex);
+		if (attrName.equals(ClassConstants.ATTR_Code)) {
+			ai = new CodeAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_ConstantValue)) {
+			ai = new ConstantValueAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_Exceptions)) {
+			ai = new ExceptionsAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_LineNumberTable)) {
+			ai = new LineNumberTableAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_SourceFile)) {
+			ai = new SourceFileAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_LocalVariableTable)) {
+			ai = new LocalVariableTableAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_InnerClasses)) {
+			ai = new InnerClassesAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_Synthetic)) {
+			ai = new SyntheticAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_Deprecated)) {
+			ai = new DeprecatedAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_Signature)) {
+			ai = new SignatureAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_LocalVariableTypeTable)) {
+			ai = new LocalVariableTypeTableAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_RuntimeVisibleAnnotations)) {
+			ai = new RuntimeVisibleAnnotationsAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_RuntimeInvisibleAnnotations)) {
+			ai = new RuntimeInvisibleAnnotationsAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_RuntimeVisibleParameterAnnotations)) {
+			ai = new RuntimeVisibleParameterAnnotationsAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_RuntimeInvisibleParameterAnnotations)) {
+			ai = new RuntimeInvisibleParameterAnnotationsAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_AnnotationDefault)) {
+			ai = new AnnotationDefaultAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_EnclosingMethod)) {
+			ai = new EnclosingMethodAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_StackMapTable)) {
+			ai = new StackMapTableAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_BootstrapMethods)) {
+			ai = new BootstrapMethodsAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_NestHost)) {
+			ai = new NestHostAttrInfo(cf, attrNameIndex, attrLength);
+		} else if (attrName.equals(ClassConstants.ATTR_NestMembers)) {
+			ai = new NestMembersAttrInfo(cf, attrNameIndex, attrLength);
+		} else {
+			ai = new AttrInfo(cf, attrNameIndex, attrLength);
+		}
+		ai.source = source;
+		ai.readInfo(din);
+		return ai;
+	}
 
-    // Class Methods ---------------------------------------------------------
-    /**
-     * Create a new AttrInfo from the data passed.
-     * 
-     * @param din
-     * @param cf
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    public static AttrInfo create(DataInput din, ClassFile cf, AttrSource source) throws IOException, ClassFileException
-    {
-        if (din == null)
-        {
-            throw new IOException("No input stream was provided.");
-        }
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param cf
+	 * @param attrNameIndex
+	 * @param attrLength
+	 */
+	protected AttrInfo(final ClassFile cf, final int attrNameIndex, final int attrLength) {
+		this.cf = cf;
+		this.u2attrNameIndex = attrNameIndex;
+		this.u4attrLength = attrLength;
+	}
 
-        // Instantiate based on attribute name
-        AttrInfo ai = null;
-        int attrNameIndex = din.readUnsignedShort();
-        int attrLength = din.readInt();
-        String attrName = cf.getUtf8(attrNameIndex);
-        if (attrName.equals(ClassConstants.ATTR_Code))
-        {
-            ai = new CodeAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_ConstantValue))
-        {
-            ai = new ConstantValueAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_Exceptions))
-        {
-            ai = new ExceptionsAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_LineNumberTable))
-        {
-            ai = new LineNumberTableAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_SourceFile))
-        {
-            ai = new SourceFileAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_LocalVariableTable))
-        {
-            ai = new LocalVariableTableAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_InnerClasses))
-        {
-            ai = new InnerClassesAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_Synthetic))
-        {
-            ai = new SyntheticAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_Deprecated))
-        {
-            ai = new DeprecatedAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_Signature))
-        {
-            ai = new SignatureAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_LocalVariableTypeTable))
-        {
-            ai = new LocalVariableTypeTableAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_RuntimeVisibleAnnotations))
-        {
-            ai = new RuntimeVisibleAnnotationsAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_RuntimeInvisibleAnnotations))
-        {
-            ai = new RuntimeInvisibleAnnotationsAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_RuntimeVisibleParameterAnnotations))
-        {
-            ai = new RuntimeVisibleParameterAnnotationsAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_RuntimeInvisibleParameterAnnotations))
-        {
-            ai = new RuntimeInvisibleParameterAnnotationsAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_AnnotationDefault))
-        {
-            ai = new AnnotationDefaultAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_EnclosingMethod))
-        {
-            ai = new EnclosingMethodAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_StackMapTable))
-        {
-            ai = new StackMapTableAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_BootstrapMethods))
-        {
-            ai = new BootstrapMethodsAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_NestHost))
-        {
-            ai = new NestHostAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else if (attrName.equals(ClassConstants.ATTR_NestMembers))
-        {
-            ai = new NestMembersAttrInfo(cf, attrNameIndex, attrLength);
-        }
-        else
-        {
-            ai = new AttrInfo(cf, attrNameIndex, attrLength);
-        }
-        ai.source = source;
-        ai.readInfo(din);
-        return ai;
-    }
+	/**
+	 * Return the length in bytes of the attribute; over-ride this in sub-classes.
+	 */
+	protected int getAttrInfoLength() {
+		return this.u4attrLength;
+	}
 
+	/**
+	 * Return the String name of the attribute; over-ride this in sub-classes.
+	 */
+	@SuppressWarnings("static-method")
+	protected String getAttrName() {
+		return ClassConstants.ATTR_Unknown;
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param cf
-     * @param attrNameIndex
-     * @param attrLength
-     */
-    protected AttrInfo(ClassFile cf, int attrNameIndex, int attrLength)
-    {
-        this.cf = cf;
-        this.u2attrNameIndex = attrNameIndex;
-        this.u4attrLength = attrLength;
-    }
+	/**
+	 * Trim attributes from the classfile except those in the {@code List<String>}.
+	 * 
+	 * @param keepAttrs
+	 */
+	protected void trimAttrsExcept(final List<String> keepAttrs) {
+		// do nothing
+	}
 
-    /**
-     * Return the length in bytes of the attribute; over-ride this in sub-classes.
-     */
-    protected int getAttrInfoLength()
-    {
-        return this.u4attrLength;
-    }
+	/**
+	 * Check for Utf8 references to constant pool and mark them.
+	 * 
+	 * @param pool
+	 * @throws ClassFileException
+	 */
+	protected void markUtf8Refs(final ConstantPool pool) throws ClassFileException {
+		pool.incRefCount(this.u2attrNameIndex);
+		this.markUtf8RefsInInfo(pool);
+	}
 
-    /**
-     * Return the String name of the attribute; over-ride this in sub-classes.
-     */
-    @SuppressWarnings("static-method")
-    protected String getAttrName()
-    {
-        return ClassConstants.ATTR_Unknown;
-    }
+	/**
+	 * Check for Utf8 references in the 'info' data to the constant pool and mark
+	 * them; over-ride this in sub-classes.
+	 * 
+	 * @param pool
+	 * @throws ClassFileException
+	 */
+	protected void markUtf8RefsInInfo(final ConstantPool pool) throws ClassFileException {
+		// do nothing
+	}
 
-    /**
-     * Trim attributes from the classfile except those in the {@code List<String>}.
-     * 
-     * @param keepAttrs
-     */
-    protected void trimAttrsExcept(List<String> keepAttrs)
-    {
-        // do nothing
-    }
+	/**
+	 * Read the data following the header; over-ride this in sub-classes.
+	 * 
+	 * @param din
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		this.info = new byte[this.u4attrLength];
+		din.readFully(this.info);
+	}
 
-    /**
-     * Check for Utf8 references to constant pool and mark them.
-     * 
-     * @param pool
-     * @throws ClassFileException
-     */
-    protected void markUtf8Refs(ConstantPool pool) throws ClassFileException
-    {
-        pool.incRefCount(this.u2attrNameIndex);
-        this.markUtf8RefsInInfo(pool);
-    }
+	/**
+	 * Export the representation to a DataOutput stream.
+	 * 
+	 * @param dout
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	public void write(final DataOutput dout) throws IOException, ClassFileException {
+		if (dout == null) {
+			throw new IOException("No output stream was provided.");
+		}
+		dout.writeShort(this.u2attrNameIndex);
+		dout.writeInt(this.getAttrInfoLength());
+		this.writeInfo(dout);
+	}
 
-    /**
-     * Check for Utf8 references in the 'info' data to the constant pool and mark them; over-ride this in sub-classes.
-     * 
-     * @param pool
-     * @throws ClassFileException
-     */
-    protected void markUtf8RefsInInfo(ConstantPool pool) throws ClassFileException
-    {
-        // do nothing
-    }
+	/**
+	 * Export data following the header to a DataOutput stream; over-ride this in
+	 * sub-classes.
+	 * 
+	 * @param dout
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	public void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.write(this.info);
+	}
 
-    /**
-     * Read the data following the header; over-ride this in sub-classes.
-     * 
-     * @param din
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        this.info = new byte[this.u4attrLength];
-        din.readFully(this.info);
-    }
-
-    /**
-     * Export the representation to a DataOutput stream.
-     * 
-     * @param dout
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    public void write(DataOutput dout) throws IOException, ClassFileException
-    {
-        if (dout == null)
-        {
-            throw new IOException("No output stream was provided.");
-        }
-        dout.writeShort(this.u2attrNameIndex);
-        dout.writeInt(this.getAttrInfoLength());
-        this.writeInfo(dout);
-    }
-
-    /**
-     * Export data following the header to a DataOutput stream; over-ride this in sub-classes.
-     * 
-     * @param dout
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    public void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.write(this.info);
-    }
-
-    /**
-     * Do necessary name remapping.
-     * 
-     * @param cf
-     * @param nm
-     * @throws ClassFileException
-     */
-    protected void remap(ClassFile cf, NameMapper nm) throws ClassFileException
-    {
-        // do nothing
-    }
+	/**
+	 * Do necessary name remapping.
+	 * 
+	 * @param cf
+	 * @param nm
+	 * @throws ClassFileException
+	 */
+	protected void remap(final ClassFile cf, final NameMapper nm) throws ClassFileException {
+		// do nothing
+	}
 }

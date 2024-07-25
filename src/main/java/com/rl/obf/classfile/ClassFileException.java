@@ -1,36 +1,28 @@
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+public class ClassFileException extends Exception {
+	private static final long serialVersionUID = 1L;
 
-public class ClassFileException extends Exception
-{
-    private static final long serialVersionUID = 1L;
+	/**
+	 * Constructor
+	 */
+	public ClassFileException() {
+	}
 
-    /**
-     * Constructor
-     */
-    public ClassFileException()
-    {
-    }
+	/**
+	 * Constructor
+	 * 
+	 * @param message
+	 */
+	public ClassFileException(final String message) {
+		super(message);
+	}
 
-    /**
-     * Constructor
-     * 
-     * @param message
-     */
-    public ClassFileException(String message)
-    {
-        super(message);
-    }
+	public ClassFileException(final Throwable cause) {
+		super(cause);
+	}
 
-    public ClassFileException(Throwable cause)
-    {
-        super(cause);
-    }
-
-    public ClassFileException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+	public ClassFileException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
 }

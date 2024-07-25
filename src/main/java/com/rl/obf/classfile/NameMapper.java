@@ -19,78 +19,76 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.util.List;
 
 /**
  * Interface to a class, method, field remapping table.
- * 
+ *
  * @author Mark Welsh
  */
-public interface NameMapper
-{
-    // Interface Methods -----------------------------------------------------
-    /**
-     * Return a {@code List<String>} of attributes marked to keep.
-     */
-    public List<String> getAttrsToKeep();
+public interface NameMapper {
+	// Interface Methods -----------------------------------------------------
+	/**
+	 * Return a {@code List<String>} of attributes marked to keep.
+	 */
+	public List<String> getAttrsToKeep();
 
-    /**
-     * Mapping for fully qualified class name.
-     * 
-     * @param className
-     * @throws ClassFileException
-     */
-    public String mapClass(String className) throws ClassFileException;
+	/**
+	 * Mapping for fully qualified class name.
+	 * 
+	 * @param className
+	 * @throws ClassFileException
+	 */
+	public String mapClass(String className) throws ClassFileException;
 
-    /**
-     * Mapping for method name, of fully qualified class.
-     * 
-     * @param className
-     * @param methodName
-     * @param descriptor
-     * @throws ClassFileException
-     */
-    public String mapMethod(String className, String methodName, String descriptor) throws ClassFileException;
+	/**
+	 * Mapping for method name, of fully qualified class.
+	 * 
+	 * @param className
+	 * @param methodName
+	 * @param descriptor
+	 * @throws ClassFileException
+	 */
+	public String mapMethod(String className, String methodName, String descriptor) throws ClassFileException;
 
-    /**
-     * Mapping for field name, of fully qualified class.
-     * 
-     * @param className
-     * @param fieldName
-     * @throws ClassFileException
-     */
-    public String mapField(String className, String fieldName) throws ClassFileException;
+	/**
+	 * Mapping for field name, of fully qualified class.
+	 * 
+	 * @param className
+	 * @param fieldName
+	 * @throws ClassFileException
+	 */
+	public String mapField(String className, String fieldName) throws ClassFileException;
 
-    /**
-     * Mapping for descriptor of field or method.
-     * 
-     * @param descriptor
-     * @throws ClassFileException
-     */
-    public String mapDescriptor(String descriptor) throws ClassFileException;
+	/**
+	 * Mapping for descriptor of field or method.
+	 * 
+	 * @param descriptor
+	 * @throws ClassFileException
+	 */
+	public String mapDescriptor(String descriptor) throws ClassFileException;
 
-    /**
-     * Mapping for generic type signature of class.
-     * 
-     * @param signature
-     * @throws ClassFileException
-     */
-    public String mapSignatureClass(String signature) throws ClassFileException;
+	/**
+	 * Mapping for generic type signature of class.
+	 * 
+	 * @param signature
+	 * @throws ClassFileException
+	 */
+	public String mapSignatureClass(String signature) throws ClassFileException;
 
-    /**
-     * Mapping for generic type signature of method.
-     * 
-     * @param signature
-     * @throws ClassFileException
-     */
-    public String mapSignatureMethod(String signature) throws ClassFileException;
+	/**
+	 * Mapping for generic type signature of method.
+	 * 
+	 * @param signature
+	 * @throws ClassFileException
+	 */
+	public String mapSignatureMethod(String signature) throws ClassFileException;
 
-    /**
-     * Mapping for generic type signature of field.
-     * 
-     * @param signature
-     * @throws ClassFileException
-     */
-    public String mapSignatureField(String signature) throws ClassFileException;
+	/**
+	 * Mapping for generic type signature of field.
+	 * 
+	 * @param signature
+	 * @throws ClassFileException
+	 */
+	public String mapSignatureField(String signature) throws ClassFileException;
 }

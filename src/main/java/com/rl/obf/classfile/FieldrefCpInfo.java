@@ -19,31 +19,23 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
-
 /**
  * Representation of a 'fieldref' entry in the ConstantPool.
- * 
+ *
  * @author Mark Welsh
  */
-public class FieldrefCpInfo extends RefCpInfo
-{
-    // Constants -------------------------------------------------------------
+public class FieldrefCpInfo extends RefCpInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
 
-    // Fields ----------------------------------------------------------------
+	// Class Methods ---------------------------------------------------------
 
-
-    // Class Methods ---------------------------------------------------------
-
-
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     */
-    protected FieldrefCpInfo()
-    {
-        super(ClassConstants.CONSTANT_Fieldref);
-    }
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 */
+	protected FieldrefCpInfo() {
+		super(ClassConstants.CONSTANT_Fieldref);
+	}
 }

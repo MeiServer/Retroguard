@@ -19,66 +19,60 @@
 
 package com.rl.obf;
 
-
 /**
  * Central point for version and build control.
- * 
+ *
  * @author Mark Welsh
  */
-public class Version
-{
-    // Constants -------------------------------------------------------------
-    private static final String REL_VERSION = "3.6.6";
-    private static final String ORIG_VERSION = "2.3.1";
-    private static final String RETROGUARD_CLASS_ID = "RGMCP";
-    private static final String RETROGUARD_REL_JAR_COMMENT = "Obfuscation by RetroGuard MCP";
-    private static final String RETROGUARD_FULL_VERSION_COMMENT = "RetroGuard MCP v" + Version.REL_VERSION + "\n"
-        + "based on RetroGuard v" + Version.ORIG_VERSION + " by Retrologic Systems - www.retrologic.com";
+public class Version {
+	// Constants -------------------------------------------------------------
+	private static final String REL_VERSION = "3.6.6";
+	private static final String ORIG_VERSION = "2.3.1";
+	private static final String RETROGUARD_CLASS_ID = "RGMCP";
+	private static final String RETROGUARD_REL_JAR_COMMENT = "Obfuscation by RetroGuard MCP";
+	private static final String RETROGUARD_FULL_VERSION_COMMENT = "RetroGuard MCP v" + Version.REL_VERSION + "\n"
+			+ "based on RetroGuard v" + Version.ORIG_VERSION + " by Retrologic Systems - www.retrologic.com";
 
-    public static final boolean isLite = true;
-    
-    private static String classIdentifier = RETROGUARD_CLASS_ID;
+	public static final boolean isLite = true;
 
+	private static String classIdentifier = Version.RETROGUARD_CLASS_ID;
 
-    // Class Methods ---------------------------------------------------------
-    /**
-     * Return the current major.minor.patch version string.
-     */
-    public static String getVersion()
-    {
-        return Version.REL_VERSION;
-    }
+	// Class Methods ---------------------------------------------------------
+	/**
+	 * Return the current major.minor.patch version string.
+	 */
+	public static String getVersion() {
+		return Version.REL_VERSION;
+	}
 
-    /**
-     * Return a major.minor.patch versioned comment string.
-     */
-    public static String getVersionComment()
-    {
-        return Version.RETROGUARD_FULL_VERSION_COMMENT;
-    }
+	/**
+	 * Return a major.minor.patch versioned comment string.
+	 */
+	public static String getVersionComment() {
+		return Version.RETROGUARD_FULL_VERSION_COMMENT;
+	}
 
-    /**
-     * Return the current class ID string.
-     */
-    public static String getClassIdString()
-    {
-        return Version.classIdentifier;
-    }
+	/**
+	 * Return the current class ID string.
+	 */
+	public static String getClassIdString() {
+		return Version.classIdentifier;
+	}
 
-    /**
-     * Set the current class ID string.
-     * @param value New ID string value
-     */
-    public static void setClassIdString(String value)
-    {
-        Version.classIdentifier = value;
-    }
+	/**
+	 * Set the current class ID string.
+	 *
+	 * @param value
+	 *            New ID string value
+	 */
+	public static void setClassIdString(final String value) {
+		Version.classIdentifier = value;
+	}
 
-    /**
-     * Return the default Jar comment string.
-     */
-    public static String getJarComment()
-    {
-        return Version.RETROGUARD_REL_JAR_COMMENT;
-    }
+	/**
+	 * Return the default Jar comment string.
+	 */
+	public static String getJarComment() {
+		return Version.RETROGUARD_REL_JAR_COMMENT;
+	}
 }

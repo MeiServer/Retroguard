@@ -19,69 +19,62 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of an attribute.
- * 
+ *
  * @author Mark Welsh
  */
-public class ConstantValueAttrInfo extends AttrInfo
-{
-    // Constants -------------------------------------------------------------
+public class ConstantValueAttrInfo extends AttrInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u2constantValueIndex;
 
-    // Fields ----------------------------------------------------------------
-    private int u2constantValueIndex;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param cf
+	 * @param attrNameIndex
+	 * @param attrLength
+	 */
+	protected ConstantValueAttrInfo(final ClassFile cf, final int attrNameIndex, final int attrLength) {
+		super(cf, attrNameIndex, attrLength);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Return the String name of the attribute; over-ride this in sub-classes.
+	 */
+	@Override
+	protected String getAttrName() {
+		return ClassConstants.ATTR_ConstantValue;
+	}
 
+	/**
+	 * Read the data following the header.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		this.u2constantValueIndex = din.readUnsignedShort();
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param cf
-     * @param attrNameIndex
-     * @param attrLength
-     */
-    protected ConstantValueAttrInfo(ClassFile cf, int attrNameIndex, int attrLength)
-    {
-        super(cf, attrNameIndex, attrLength);
-    }
-
-    /**
-     * Return the String name of the attribute; over-ride this in sub-classes.
-     */
-    @Override
-    protected String getAttrName()
-    {
-        return ClassConstants.ATTR_ConstantValue;
-    }
-
-    /**
-     * Read the data following the header.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        this.u2constantValueIndex = din.readUnsignedShort();
-    }
-
-    /**
-     * Export data following the header to a DataOutput stream.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    public void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeShort(this.u2constantValueIndex);
-    }
+	/**
+	 * Export data following the header to a DataOutput stream.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	public void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeShort(this.u2constantValueIndex);
+	}
 }

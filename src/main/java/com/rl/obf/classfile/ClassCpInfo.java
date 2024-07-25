@@ -19,96 +19,86 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of a 'class' entry in the ConstantPool.
- * 
+ *
  * @author Mark Welsh
  */
-public class ClassCpInfo extends CpInfo
-{
-    // Constants -------------------------------------------------------------
+public class ClassCpInfo extends CpInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u2nameIndex;
 
-    // Fields ----------------------------------------------------------------
-    private int u2nameIndex;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 */
+	protected ClassCpInfo() {
+		super(ClassConstants.CONSTANT_Class);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Return the name index.
+	 */
+	protected int getNameIndex() {
+		return this.u2nameIndex;
+	}
 
+	/**
+	 * Set the name index.
+	 * 
+	 * @param index
+	 */
+	protected void setNameIndex(final int index) {
+		this.u2nameIndex = index;
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     */
-    protected ClassCpInfo()
-    {
-        super(ClassConstants.CONSTANT_Class);
-    }
+	/**
+	 * Return the string name.
+	 * 
+	 * @param cf
+	 * @throws ClassFileException
+	 */
+	public String getName(final ClassFile cf) throws ClassFileException {
+		return cf.getUtf8(this.u2nameIndex);
+	}
 
-    /**
-     * Return the name index.
-     */
-    protected int getNameIndex()
-    {
-        return this.u2nameIndex;
-    }
+	/**
+	 * Check for Utf8 references to constant pool and mark them.
+	 * 
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void markUtf8Refs(final ConstantPool pool) throws ClassFileException {
+		pool.incRefCount(this.u2nameIndex);
+	}
 
-    /**
-     * Set the name index.
-     * 
-     * @param index
-     */
-    protected void setNameIndex(int index)
-    {
-        this.u2nameIndex = index;
-    }
+	/**
+	 * Read the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		this.u2nameIndex = din.readUnsignedShort();
+	}
 
-    /**
-     * Return the string name.
-     * 
-     * @param cf
-     * @throws ClassFileException
-     */
-    public String getName(ClassFile cf) throws ClassFileException
-    {
-        return cf.getUtf8(this.u2nameIndex);
-    }
-
-    /**
-     * Check for Utf8 references to constant pool and mark them.
-     * 
-     * @throws ClassFileException
-     */
-    @Override
-    protected void markUtf8Refs(ConstantPool pool) throws ClassFileException
-    {
-        pool.incRefCount(this.u2nameIndex);
-    }
-
-    /**
-     * Read the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        this.u2nameIndex = din.readUnsignedShort();
-    }
-
-    /**
-     * Write the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeShort(this.u2nameIndex);
-    }
+	/**
+	 * Write the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeShort(this.u2nameIndex);
+	}
 }

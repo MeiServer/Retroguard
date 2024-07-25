@@ -19,53 +19,43 @@
 
 package com.rl.obf;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
-
-import com.rl.obf.classfile.*;
-import com.rl.util.*;
+import com.rl.obf.classfile.ClassFileException;
 
 /**
  * Tree item representing a method.
- * 
+ *
  * @author Mark Welsh
  */
-public class Md extends MdFd
-{
-    // Constants -------------------------------------------------------------
+public class Md extends MdFd {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
 
-    // Fields ----------------------------------------------------------------
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param parent
+	 * @param isSynthetic
+	 * @param name
+	 * @param descriptor
+	 * @param access
+	 * @throws ClassFileException
+	 */
+	public Md(final TreeItem parent, final boolean isSynthetic, final String name, final String descriptor,
+			final int access) throws ClassFileException {
+		super(parent, isSynthetic, name, descriptor, access);
+	}
 
-    // Class Methods ---------------------------------------------------------
-
-
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param parent
-     * @param isSynthetic
-     * @param name
-     * @param descriptor
-     * @param access
-     * @throws ClassFileException
-     */
-    public Md(TreeItem parent, boolean isSynthetic, String name, String descriptor, int access) throws ClassFileException
-    {
-        super(parent, isSynthetic, name, descriptor, access);
-    }
-
-    /**
-     * Does this method match the wildcard pattern? (compatibility mode)
-     * 
-     * @param namePattern
-     * @param descPattern
-     */
-    public boolean isOldStyleMatch(String namePattern, String descPattern)
-    {
-        return this.isOldStyleMatch(namePattern) && TreeItem.isMatch(descPattern, this.getDescriptor());
-    }
+	/**
+	 * Does this method match the wildcard pattern? (compatibility mode)
+	 * 
+	 * @param namePattern
+	 * @param descPattern
+	 */
+	public boolean isOldStyleMatch(final String namePattern, final String descPattern) {
+		return this.isOldStyleMatch(namePattern) && TreeItem.isMatch(descPattern, this.getDescriptor());
+	}
 }

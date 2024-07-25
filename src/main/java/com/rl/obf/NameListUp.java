@@ -22,44 +22,44 @@ package com.rl.obf;
 import com.rl.obf.classfile.ClassFileException;
 
 /**
- * Interface to a list of method and field names and descriptors -- used for checking if a name/descriptor is in the
- * public/protected lists of the super-class/interface hierarchy.
- * 
+ * Interface to a list of method and field names and descriptors -- used for
+ * checking if a name/descriptor is in the public/protected lists of the
+ * super-class/interface hierarchy.
+ *
  * @author Mark Welsh
  */
-public interface NameListUp
-{
-    /**
-     * Get output method name from list, or null if no mapping exists.
-     * 
-     * @param name
-     * @param descriptor
-     * @throws ClassFileException
-     */
-    public String getMethodOutNameUp(String name, String descriptor) throws ClassFileException;
+public interface NameListUp {
+	/**
+	 * Get output method name from list, or null if no mapping exists.
+	 * 
+	 * @param name
+	 * @param descriptor
+	 * @throws ClassFileException
+	 */
+	public String getMethodOutNameUp(String name, String descriptor) throws ClassFileException;
 
-    /**
-     * Get obfuscated method name from list, or null if no mapping exists.
-     * 
-     * @param name
-     * @param descriptor
-     * @throws ClassFileException
-     */
-    public String getMethodObfNameUp(String name, String descriptor) throws ClassFileException;
+	/**
+	 * Get obfuscated method name from list, or null if no mapping exists.
+	 * 
+	 * @param name
+	 * @param descriptor
+	 * @throws ClassFileException
+	 */
+	public String getMethodObfNameUp(String name, String descriptor) throws ClassFileException;
 
-    /**
-     * Get output field name from list, or null if no mapping exists.
-     * 
-     * @param name
-     * @throws ClassFileException
-     */
-    public String getFieldOutNameUp(String name) throws ClassFileException;
+	/**
+	 * Get output field name from list, or null if no mapping exists.
+	 * 
+	 * @param name
+	 * @throws ClassFileException
+	 */
+	public String getFieldOutNameUp(String name) throws ClassFileException;
 
-    /**
-     * Get obfuscated field name from list, or null if no mapping exists.
-     * 
-     * @param name
-     * @throws ClassFileException
-     */
-    public String getFieldObfNameUp(String name) throws ClassFileException;
+	/**
+	 * Get obfuscated field name from list, or null if no mapping exists.
+	 * 
+	 * @param name
+	 * @throws ClassFileException
+	 */
+	public String getFieldObfNameUp(String name) throws ClassFileException;
 }

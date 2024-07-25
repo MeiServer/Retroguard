@@ -19,56 +19,50 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of a 'integer' entry in the ConstantPool.
- * 
+ *
  * @author Mark Welsh
  */
-public class IntegerCpInfo extends CpInfo
-{
-    // Constants -------------------------------------------------------------
+public class IntegerCpInfo extends CpInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u4bytes;
 
-    // Fields ----------------------------------------------------------------
-    private int u4bytes;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 */
+	protected IntegerCpInfo() {
+		super(ClassConstants.CONSTANT_Integer);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Read the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		this.u4bytes = din.readInt();
+	}
 
-
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     */
-    protected IntegerCpInfo()
-    {
-        super(ClassConstants.CONSTANT_Integer);
-    }
-
-    /**
-     * Read the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        this.u4bytes = din.readInt();
-    }
-
-    /**
-     * Write the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeInt(this.u4bytes);
-    }
+	/**
+	 * Write the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeInt(this.u4bytes);
+	}
 }

@@ -19,115 +19,104 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of an Local Variable Type table entry.
- * 
+ *
  * @author Mark Welsh
  */
-public class LocalVariableTypeInfo
-{
-    // Constants -------------------------------------------------------------
+public class LocalVariableTypeInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u2startpc;
+	private int u2length;
+	private int u2nameIndex;
+	private int u2signatureIndex;
+	private int u2index;
 
-    // Fields ----------------------------------------------------------------
-    private int u2startpc;
-    private int u2length;
-    private int u2nameIndex;
-    private int u2signatureIndex;
-    private int u2index;
+	// Class Methods ---------------------------------------------------------
+	/**
+	 * @param din
+	 * @throws IOException
+	 */
+	public static LocalVariableTypeInfo create(final DataInput din) throws IOException {
+		final LocalVariableTypeInfo lvti = new LocalVariableTypeInfo();
+		lvti.read(din);
+		return lvti;
+	}
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Private constructor
+	 */
+	private LocalVariableTypeInfo() {
+	}
 
-    // Class Methods ---------------------------------------------------------
-    /**
-     * @param din
-     * @throws IOException
-     */
-    public static LocalVariableTypeInfo create(DataInput din) throws IOException
-    {
-        LocalVariableTypeInfo lvti = new LocalVariableTypeInfo();
-        lvti.read(din);
-        return lvti;
-    }
+	/**
+	 * Return name index into Constant Pool.
+	 */
+	protected int getNameIndex() {
+		return this.u2nameIndex;
+	}
 
+	/**
+	 * Return signature index into Constant Pool.
+	 */
+	protected int getSignatureIndex() {
+		return this.u2signatureIndex;
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Private constructor
-     */
-    private LocalVariableTypeInfo()
-    {
-    }
+	/**
+	 * Check for Utf8 references to constant pool and mark them.
+	 * 
+	 * @param pool
+	 * @throws ClassFileException
+	 */
+	protected void markUtf8Refs(final ConstantPool pool) throws ClassFileException {
+		pool.incRefCount(this.u2nameIndex);
+		pool.incRefCount(this.u2signatureIndex);
+	}
 
-    /**
-     * Return name index into Constant Pool.
-     */
-    protected int getNameIndex()
-    {
-        return this.u2nameIndex;
-    }
+	/**
+	 * @param din
+	 * @throws IOException
+	 */
+	private void read(final DataInput din) throws IOException {
+		this.u2startpc = din.readUnsignedShort();
+		this.u2length = din.readUnsignedShort();
+		this.u2nameIndex = din.readUnsignedShort();
+		this.u2signatureIndex = din.readUnsignedShort();
+		this.u2index = din.readUnsignedShort();
+	}
 
-    /**
-     * Return signature index into Constant Pool.
-     */
-    protected int getSignatureIndex()
-    {
-        return this.u2signatureIndex;
-    }
+	/**
+	 * Export the representation to a DataOutput stream.
+	 * 
+	 * @param dout
+	 * @throws IOException
+	 */
+	public void write(final DataOutput dout) throws IOException {
+		dout.writeShort(this.u2startpc);
+		dout.writeShort(this.u2length);
+		dout.writeShort(this.u2nameIndex);
+		dout.writeShort(this.u2signatureIndex);
+		dout.writeShort(this.u2index);
+	}
 
-    /**
-     * Check for Utf8 references to constant pool and mark them.
-     * 
-     * @param pool
-     * @throws ClassFileException
-     */
-    protected void markUtf8Refs(ConstantPool pool) throws ClassFileException
-    {
-        pool.incRefCount(this.u2nameIndex);
-        pool.incRefCount(this.u2signatureIndex);
-    }
-
-    /**
-     * @param din
-     * @throws IOException
-     */
-    private void read(DataInput din) throws IOException
-    {
-        this.u2startpc = din.readUnsignedShort();
-        this.u2length = din.readUnsignedShort();
-        this.u2nameIndex = din.readUnsignedShort();
-        this.u2signatureIndex = din.readUnsignedShort();
-        this.u2index = din.readUnsignedShort();
-    }
-
-    /**
-     * Export the representation to a DataOutput stream.
-     * 
-     * @param dout
-     * @throws IOException
-     */
-    public void write(DataOutput dout) throws IOException
-    {
-        dout.writeShort(this.u2startpc);
-        dout.writeShort(this.u2length);
-        dout.writeShort(this.u2nameIndex);
-        dout.writeShort(this.u2signatureIndex);
-        dout.writeShort(this.u2index);
-    }
-
-    /**
-     * Do necessary name remapping.
-     * 
-     * @param cf
-     * @param nm
-     * @throws ClassFileException
-     */
-    protected void remap(ClassFile cf, NameMapper nm) throws ClassFileException
-    {
-        String oldDesc = cf.getUtf8(this.u2signatureIndex);
-        String newDesc = nm.mapSignatureField(oldDesc);
-        this.u2signatureIndex = cf.remapUtf8To(newDesc, this.u2signatureIndex);
-    }
+	/**
+	 * Do necessary name remapping.
+	 * 
+	 * @param cf
+	 * @param nm
+	 * @throws ClassFileException
+	 */
+	protected void remap(final ClassFile cf, final NameMapper nm) throws ClassFileException {
+		final String oldDesc = cf.getUtf8(this.u2signatureIndex);
+		final String newDesc = nm.mapSignatureField(oldDesc);
+		this.u2signatureIndex = cf.remapUtf8To(newDesc, this.u2signatureIndex);
+	}
 }

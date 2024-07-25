@@ -19,135 +19,122 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of an Local Variable table entry.
- * 
+ *
  * @author Mark Welsh
  */
-public class LocalVariableInfo
-{
-    // Constants -------------------------------------------------------------
+public class LocalVariableInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u2startpc;
+	private int u2length;
+	private int u2nameIndex;
+	private int u2descriptorIndex;
+	private int u2index;
 
-    // Fields ----------------------------------------------------------------
-    private int u2startpc;
-    private int u2length;
-    private int u2nameIndex;
-    private int u2descriptorIndex;
-    private int u2index;
+	// Class Methods ---------------------------------------------------------
+	/**
+	 * @param din
+	 * @throws IOException
+	 */
+	public static LocalVariableInfo create(final DataInput din) throws IOException {
+		final LocalVariableInfo lvi = new LocalVariableInfo();
+		lvi.read(din);
+		return lvi;
+	}
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Private constructor
+	 */
+	private LocalVariableInfo() {
+	}
 
-    // Class Methods ---------------------------------------------------------
-    /**
-     * @param din
-     * @throws IOException
-     */
-    public static LocalVariableInfo create(DataInput din) throws IOException
-    {
-        LocalVariableInfo lvi = new LocalVariableInfo();
-        lvi.read(din);
-        return lvi;
-    }
+	/**
+	 * Return name index into Constant Pool.
+	 */
+	protected int getNameIndex() {
+		return this.u2nameIndex;
+	}
 
+	/**
+	 * Set the name index.
+	 * 
+	 * @param index
+	 */
+	protected void setNameIndex(final int index) {
+		this.u2nameIndex = index;
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Private constructor
-     */
-    private LocalVariableInfo()
-    {
-    }
+	/**
+	 * Return descriptor index into Constant Pool.
+	 */
+	protected int getDescriptorIndex() {
+		return this.u2descriptorIndex;
+	}
 
-    /**
-     * Return name index into Constant Pool.
-     */
-    protected int getNameIndex()
-    {
-        return this.u2nameIndex;
-    }
+	/**
+	 * Set the descriptor index.
+	 * 
+	 * @param index
+	 */
+	protected void setDescriptorIndex(final int index) {
+		this.u2descriptorIndex = index;
+	}
 
-    /**
-     * Set the name index.
-     * 
-     * @param index
-     */
-    protected void setNameIndex(int index)
-    {
-        this.u2nameIndex = index;
-    }
+	/**
+	 * Check for Utf8 references to constant pool and mark them.
+	 * 
+	 * @param pool
+	 * @throws ClassFileException
+	 */
+	protected void markUtf8Refs(final ConstantPool pool) throws ClassFileException {
+		pool.incRefCount(this.u2nameIndex);
+		pool.incRefCount(this.u2descriptorIndex);
+	}
 
-    /**
-     * Return descriptor index into Constant Pool.
-     */
-    protected int getDescriptorIndex()
-    {
-        return this.u2descriptorIndex;
-    }
+	/**
+	 * @param din
+	 * @throws IOException
+	 */
+	private void read(final DataInput din) throws IOException {
+		this.u2startpc = din.readUnsignedShort();
+		this.u2length = din.readUnsignedShort();
+		this.u2nameIndex = din.readUnsignedShort();
+		this.u2descriptorIndex = din.readUnsignedShort();
+		this.u2index = din.readUnsignedShort();
+	}
 
-    /**
-     * Set the descriptor index.
-     * 
-     * @param index
-     */
-    protected void setDescriptorIndex(int index)
-    {
-        this.u2descriptorIndex = index;
-    }
+	/**
+	 * Export the representation to a DataOutput stream.
+	 * 
+	 * @param dout
+	 * @throws IOException
+	 */
+	public void write(final DataOutput dout) throws IOException {
+		dout.writeShort(this.u2startpc);
+		dout.writeShort(this.u2length);
+		dout.writeShort(this.u2nameIndex);
+		dout.writeShort(this.u2descriptorIndex);
+		dout.writeShort(this.u2index);
+	}
 
-    /**
-     * Check for Utf8 references to constant pool and mark them.
-     * 
-     * @param pool
-     * @throws ClassFileException
-     */
-    protected void markUtf8Refs(ConstantPool pool) throws ClassFileException
-    {
-        pool.incRefCount(this.u2nameIndex);
-        pool.incRefCount(this.u2descriptorIndex);
-    }
-
-    /**
-     * @param din
-     * @throws IOException
-     */
-    private void read(DataInput din) throws IOException
-    {
-        this.u2startpc = din.readUnsignedShort();
-        this.u2length = din.readUnsignedShort();
-        this.u2nameIndex = din.readUnsignedShort();
-        this.u2descriptorIndex = din.readUnsignedShort();
-        this.u2index = din.readUnsignedShort();
-    }
-
-    /**
-     * Export the representation to a DataOutput stream.
-     * 
-     * @param dout
-     * @throws IOException
-     */
-    public void write(DataOutput dout) throws IOException
-    {
-        dout.writeShort(this.u2startpc);
-        dout.writeShort(this.u2length);
-        dout.writeShort(this.u2nameIndex);
-        dout.writeShort(this.u2descriptorIndex);
-        dout.writeShort(this.u2index);
-    }
-
-    /**
-     * Do necessary name remapping.
-     * 
-     * @param cf
-     * @param nm
-     * @throws ClassFileException
-     */
-    protected void remap(ClassFile cf, NameMapper nm) throws ClassFileException
-    {
-        String oldDesc = cf.getUtf8(this.u2descriptorIndex);
-        String newDesc = nm.mapDescriptor(oldDesc);
-        this.u2descriptorIndex = cf.remapUtf8To(newDesc, this.u2descriptorIndex);
-    }
+	/**
+	 * Do necessary name remapping.
+	 * 
+	 * @param cf
+	 * @param nm
+	 * @throws ClassFileException
+	 */
+	protected void remap(final ClassFile cf, final NameMapper nm) throws ClassFileException {
+		final String oldDesc = cf.getUtf8(this.u2descriptorIndex);
+		final String newDesc = nm.mapDescriptor(oldDesc);
+		this.u2descriptorIndex = cf.remapUtf8To(newDesc, this.u2descriptorIndex);
+	}
 }

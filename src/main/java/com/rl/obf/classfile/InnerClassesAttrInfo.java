@@ -19,114 +19,103 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Representation of an attribute.
- * 
+ *
  * @author Mark Welsh
  */
-public class InnerClassesAttrInfo extends AttrInfo
-{
-    // Constants -------------------------------------------------------------
+public class InnerClassesAttrInfo extends AttrInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private List<InnerClassesInfo> classes;
 
-    // Fields ----------------------------------------------------------------
-    private List<InnerClassesInfo> classes;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param cf
+	 * @param attrNameIndex
+	 * @param attrLength
+	 */
+	protected InnerClassesAttrInfo(final ClassFile cf, final int attrNameIndex, final int attrLength) {
+		super(cf, attrNameIndex, attrLength);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Return the String name of the attribute; over-ride this in sub-classes.
+	 */
+	@Override
+	protected String getAttrName() {
+		return ClassConstants.ATTR_InnerClasses;
+	}
 
+	/**
+	 * Return the list of inner classes data.
+	 */
+	protected List<InnerClassesInfo> getInfo() {
+		return this.classes;
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param cf
-     * @param attrNameIndex
-     * @param attrLength
-     */
-    protected InnerClassesAttrInfo(ClassFile cf, int attrNameIndex, int attrLength)
-    {
-        super(cf, attrNameIndex, attrLength);
-    }
+	/**
+	 * Check for Utf8 references in the 'info' data to the constant pool and mark
+	 * them.
+	 * 
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void markUtf8RefsInInfo(final ConstantPool pool) throws ClassFileException {
+		for (final InnerClassesInfo cl : this.classes) {
+			cl.markUtf8Refs(pool);
+		}
+	}
 
-    /**
-     * Return the String name of the attribute; over-ride this in sub-classes.
-     */
-    @Override
-    protected String getAttrName()
-    {
-        return ClassConstants.ATTR_InnerClasses;
-    }
+	/**
+	 * Read the data following the header.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		final int u2numberOfClasses = din.readUnsignedShort();
+		this.classes = new ArrayList<>(u2numberOfClasses);
+		for (int i = 0; i < u2numberOfClasses; i++) {
+			this.classes.add(InnerClassesInfo.create(din));
+		}
+	}
 
-    /**
-     * Return the list of inner classes data.
-     */
-    protected List<InnerClassesInfo> getInfo()
-    {
-        return this.classes;
-    }
+	/**
+	 * Export data following the header to a DataOutput stream.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	public void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeShort(this.classes.size());
+		for (final InnerClassesInfo cl : this.classes) {
+			cl.write(dout);
+		}
+	}
 
-    /**
-     * Check for Utf8 references in the 'info' data to the constant pool and mark them.
-     * 
-     * @throws ClassFileException
-     */
-    @Override
-    protected void markUtf8RefsInInfo(ConstantPool pool) throws ClassFileException
-    {
-        for (InnerClassesInfo cl : this.classes)
-        {
-            cl.markUtf8Refs(pool);
-        }
-    }
-
-    /**
-     * Read the data following the header.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        int u2numberOfClasses = din.readUnsignedShort();
-        this.classes = new ArrayList<InnerClassesInfo>(u2numberOfClasses);
-        for (int i = 0; i < u2numberOfClasses; i++)
-        {
-            this.classes.add(InnerClassesInfo.create(din));
-        }
-    }
-
-    /**
-     * Export data following the header to a DataOutput stream.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    public void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeShort(this.classes.size());
-        for (InnerClassesInfo cl : this.classes)
-        {
-            cl.write(dout);
-        }
-    }
-
-    /**
-     * Do necessary name remapping.
-     * 
-     * @throws ClassFileException
-     */
-    @Override
-    protected void remap(ClassFile cf, NameMapper nm) throws ClassFileException
-    {
-        for (InnerClassesInfo cl : this.classes)
-        {
-            cl.remap(cf, nm);
-        }
-    }
+	/**
+	 * Do necessary name remapping.
+	 * 
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void remap(final ClassFile cf, final NameMapper nm) throws ClassFileException {
+		for (final InnerClassesInfo cl : this.classes) {
+			cl.remap(cf, nm);
+		}
+	}
 }

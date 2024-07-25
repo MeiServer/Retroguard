@@ -19,266 +19,226 @@
 
 package com.rl.obf;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import com.rl.NameProvider;
-import com.rl.obf.classfile.*;
-import com.rl.util.*;
+import com.rl.obf.classfile.ClassFileException;
 
 /**
  * Base to package and class tree item.
- * 
+ *
  * @author Mark Welsh
  */
-abstract public class PkCl extends TreeItem
-{
-    // Constants -------------------------------------------------------------
+abstract public class PkCl extends TreeItem {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	/**
+	 * Owns a list of classes.
+	 */
+	protected Map<String, Cl> cls = new HashMap<>();
 
-    // Fields ----------------------------------------------------------------
-    /**
-     * Owns a list of classes.
-     */
-    protected Map<String, Cl> cls = new HashMap<String, Cl>();
+	/**
+	 * Compact name for this package
+	 */
+	private String repackageName = null;
 
-    /**
-     * Compact name for this package
-     */
-    private String repackageName = null;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param parent
+	 * @param name
+	 */
+	public PkCl(final TreeItem parent, final String name) {
+		super(parent, name);
 
-    // Class Methods ---------------------------------------------------------
+		if (NameProvider.oldHash) {
+			this.cls = new Hashtable<>();
+		}
+	}
 
+	/**
+	 * Get a class by name.
+	 * 
+	 * @param name
+	 */
+	public Cl getClass(final String name) {
+		return this.cls.get(name);
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param parent
-     * @param name
-     */
-    public PkCl(TreeItem parent, String name)
-    {
-        super(parent, name);
+	/**
+	 * Get a {@code Collection<Cl>} of classes directly beneath this {@code PkCl}.
+	 */
+	public Collection<Cl> getClasses() {
+		return this.cls.values();
+	}
 
-        if (NameProvider.oldHash)
-        {
-            this.cls = new Hashtable<String, Cl>();
-        }
-    }
+	/**
+	 * Add a class to the list of owned classes.
+	 * 
+	 * @param name
+	 * @param superName
+	 * @param interfaceNames
+	 * @param access
+	 */
+	abstract public Cl addClass(String name, String superName, List<String> interfaceNames, int access);
 
-    /**
-     * Get a class by name.
-     * 
-     * @param name
-     */
-    public Cl getClass(String name)
-    {
-        return this.cls.get(name);
-    }
+	/**
+	 * Add a class to the list of owned classes.
+	 * 
+	 * @param isInnerClass
+	 * @param name
+	 * @param superName
+	 * @param interfaceNames
+	 * @param access
+	 */
+	public Cl addClass(final boolean isInnerClass, final String name, final String superName,
+			final List<String> interfaceNames, final int access) {
+		Cl cl = this.getClass(name);
 
-    /**
-     * Get a {@code Collection<Cl>} of classes directly beneath this {@code PkCl}.
-     */
-    public Collection<Cl> getClasses()
-    {
-        return this.cls.values();
-    }
+		// Remove placeholder if present
+		PlaceholderCl plClassItem = null;
+		if (cl instanceof PlaceholderCl) {
+			plClassItem = (PlaceholderCl) cl;
+			this.cls.remove(name);
+			cl = null;
+		}
 
-    /**
-     * Add a class to the list of owned classes.
-     * 
-     * @param name
-     * @param superName
-     * @param interfaceNames
-     * @param access
-     */
-    abstract public Cl addClass(String name, String superName, List<String> interfaceNames, int access);
+		// Add the class, if not already present
+		if (cl == null) {
+			cl = new Cl(this, isInnerClass, name, superName, interfaceNames, access);
+			this.cls.put(name, cl);
+		}
 
-    /**
-     * Add a class to the list of owned classes.
-     * 
-     * @param isInnerClass
-     * @param name
-     * @param superName
-     * @param interfaceNames
-     * @param access
-     */
-    public Cl addClass(boolean isInnerClass, String name, String superName, List<String> interfaceNames, int access)
-    {
-        Cl cl = this.getClass(name);
+		// Copy over the inner class data from the placeholder, if any
+		if (plClassItem != null) {
+			for (final Cl innerCl : plClassItem.getClasses()) {
+				innerCl.setParent(cl);
+				cl.addClass(innerCl);
+			}
+		}
+		return cl;
+	}
 
-        // Remove placeholder if present
-        PlaceholderCl plClassItem = null;
-        if (cl instanceof PlaceholderCl)
-        {
-            plClassItem = (PlaceholderCl)cl;
-            this.cls.remove(name);
-            cl = null;
-        }
+	/**
+	 * Add a placeholder class to our list of owned classes, to be replaced later by
+	 * the full class.
+	 * 
+	 * @param name
+	 */
+	abstract public Cl addPlaceholderClass(String name);
 
-        // Add the class, if not already present
-        if (cl == null)
-        {
-            cl = new Cl(this, isInnerClass, name, superName, interfaceNames, access);
-            this.cls.put(name, cl);
-        }
+	/**
+	 * Add a placeholder class to our list of owned classes, to be replaced later by
+	 * the full class.
+	 * 
+	 * @param isInnerClass
+	 * @param name
+	 */
+	public Cl addPlaceholderClass(final boolean isInnerClass, final String name) {
+		Cl cl = this.getClass(name);
+		if (cl == null) {
+			cl = new PlaceholderCl(this, isInnerClass, name);
+			this.cls.put(name, cl);
+		}
+		return cl;
+	}
 
-        // Copy over the inner class data from the placeholder, if any
-        if (plClassItem != null)
-        {
-            for (Cl innerCl : plClassItem.getClasses())
-            {
-                innerCl.setParent(cl);
-                cl.addClass(innerCl);
-            }
-        }
-        return cl;
-    }
+	/**
+	 * Generate unique obfuscated names for this namespace.
+	 * 
+	 * @throws ClassFileException
+	 */
+	public void generateNames() throws ClassFileException {
+		PkCl.generateNames(this.cls);
+	}
 
-    /**
-     * Add a placeholder class to our list of owned classes, to be replaced later by the full class.
-     * 
-     * @param name
-     */
-    abstract public Cl addPlaceholderClass(String name);
+	/**
+	 * Set the repackage name of the entry.
+	 * 
+	 * @param repackageName
+	 */
+	public void setRepackageName(final String repackageName) {
+		if (repackageName.equals(".")) {
+			this.repackageName = "";
+		} else {
+			this.repackageName = repackageName;
+		}
+	}
 
-    /**
-     * Add a placeholder class to our list of owned classes, to be replaced later by the full class.
-     * 
-     * @param isInnerClass
-     * @param name
-     */
-    public Cl addPlaceholderClass(boolean isInnerClass, String name)
-    {
-        Cl cl = this.getClass(name);
-        if (cl == null)
-        {
-            cl = new PlaceholderCl(this, isInnerClass, name);
-            this.cls.put(name, cl);
-        }
-        return cl;
-    }
+	/**
+	 * Return the repackage name of the entry.
+	 */
+	public String getRepackageName() {
+		return this.repackageName;
+	}
 
-    /**
-     * Generate unique obfuscated names for this namespace.
-     * 
-     * @throws ClassFileException
-     */
-    public void generateNames() throws ClassFileException
-    {
-        PkCl.generateNames(this.cls);
-    }
+	/**
+	 * Return the repackage name of the entry.
+	 */
+	public String getRepackageName(final boolean output) {
+		String s = this.repackageName;
 
-    /**
-     * Set the repackage name of the entry.
-     * 
-     * @param repackageName
-     */
-    public void setRepackageName(String repackageName)
-    {
-        if (repackageName.equals("."))
-        {
-            this.repackageName = "";
-        }
-        else
-        {
-            this.repackageName = repackageName;
-        }
-    }
+		if (output && s.equals("")) {
+			s = ".";
+		}
 
-    /**
-     * Return the repackage name of the entry.
-     */
-    public String getRepackageName()
-    {
-        return this.repackageName;
-    }
+		return s;
+	}
 
-    /**
-     * Return the repackage name of the entry.
-     */
-    public String getRepackageName(boolean output)
-    {
-        String s = this.repackageName;
+	/**
+	 * Generate unique obfuscated names for a given namespace.
+	 * 
+	 * @param hash
+	 */
+	protected static void generateNames(final Map<String, ? extends TreeItem> hash) {
+		for (final TreeItem ti : hash.values()) {
+			final String fullInName = ti.getFullInName(true);
+			String thisType = "Misc";
+			if (ti instanceof Pk) {
+				thisType = "Package";
+			}
+			if (ti instanceof Cl) {
+				thisType = "Class";
+			}
 
-        if (output && s.equals(""))
-        {
-            s = ".";
-        }
-
-        return s;
-    }
-
-    /**
-     * Generate unique obfuscated names for a given namespace.
-     * 
-     * @param hash
-     */
-    protected static void generateNames(Map<String, ? extends TreeItem> hash)
-    {
-        for (TreeItem ti : hash.values())
-        {
-            String fullInName = ti.getFullInName(true);
-            String thisType = "Misc";
-            if (ti instanceof Pk)
-            {
-                thisType = "Package";
-            }
-            if (ti instanceof Cl)
-            {
-                thisType = "Class";
-            }
-
-            if ((NameProvider.currentMode != NameProvider.CLASSIC_MODE) || (!ti.isFixed()))
-            {
-                String theOutName = NameProvider.getNewTreeItemName(ti);
-                if (theOutName != null)
-                {
-                    ti.setOutName(theOutName);
-                    ti.setFromScriptMap();
-                    String fullOutName = ti.getFullOutName(true);
-                    if (fullOutName.equals(fullInName))
-                    {
-                        NameProvider.verboseLog("# " + thisType + " " + fullInName + " unchanged from name maker");
-                    }
-                    else
-                    {
-                        NameProvider.verboseLog("# " + thisType + " " + fullInName + " renamed to "
-                            + fullOutName + " from name maker");
-                    }
-                }
-                else
-                {
-                    NameProvider.verboseLog("# " + thisType + " " + fullInName + " null from name maker");
-                }
-            }
-            else if (ti.isFixed())
-            {
-                if (ti.isFromScriptMap())
-                {
-                    String fullOutName = ti.getFullOutName(true);
-                    if (fullOutName.equals(fullInName))
-                    {
-                        NameProvider.verboseLog("# " + thisType + " " + fullInName + " unchanged from ScriptMap");
-                    }
-                    else
-                    {
-                        NameProvider.verboseLog("# " + thisType + " " + fullInName + " renamed to "
-                            + fullOutName + " from ScriptMap");
-                    }
-                }
-                else if (ti.isFromScript())
-                {
-                    NameProvider.verboseLog("# " + thisType + " " + fullInName + " fixed from Script");
-                }
-                else
-                {
-                    NameProvider.verboseLog("# " + thisType + " " + fullInName + " fixed");
-                }
-            }
-        }
-    }
+			if (NameProvider.currentMode != NameProvider.CLASSIC_MODE || !ti.isFixed()) {
+				final String theOutName = NameProvider.getNewTreeItemName(ti);
+				if (theOutName != null) {
+					ti.setOutName(theOutName);
+					ti.setFromScriptMap();
+					final String fullOutName = ti.getFullOutName(true);
+					if (fullOutName.equals(fullInName)) {
+						NameProvider.verboseLog("# " + thisType + " " + fullInName + " unchanged from name maker");
+					} else {
+						NameProvider.verboseLog(
+								"# " + thisType + " " + fullInName + " renamed to " + fullOutName + " from name maker");
+					}
+				} else {
+					NameProvider.verboseLog("# " + thisType + " " + fullInName + " null from name maker");
+				}
+			} else if (ti.isFixed()) {
+				if (ti.isFromScriptMap()) {
+					final String fullOutName = ti.getFullOutName(true);
+					if (fullOutName.equals(fullInName)) {
+						NameProvider.verboseLog("# " + thisType + " " + fullInName + " unchanged from ScriptMap");
+					} else {
+						NameProvider.verboseLog(
+								"# " + thisType + " " + fullInName + " renamed to " + fullOutName + " from ScriptMap");
+					}
+				} else if (ti.isFromScript()) {
+					NameProvider.verboseLog("# " + thisType + " " + fullInName + " fixed from Script");
+				} else {
+					NameProvider.verboseLog("# " + thisType + " " + fullInName + " fixed");
+				}
+			}
+		}
+	}
 }

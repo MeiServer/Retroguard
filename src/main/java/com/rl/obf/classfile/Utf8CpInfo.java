@@ -19,141 +19,122 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Representation of a 'UTF8' entry in the ConstantPool.
- * 
+ *
  * @author Mark Welsh
  */
-public class Utf8CpInfo extends CpInfo
-{
-    // Constants -------------------------------------------------------------
+public class Utf8CpInfo extends CpInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u2length;
+	private byte[] bytes;
+	private String utf8string;
 
-    // Fields ----------------------------------------------------------------
-    private int u2length;
-    private byte[] bytes;
-    private String utf8string;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 */
+	protected Utf8CpInfo() {
+		super(ClassConstants.CONSTANT_Utf8);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Constructor used when appending fresh Utf8 entries to the constant pool.
+	 * 
+	 * @param s
+	 */
+	public Utf8CpInfo(final String s) {
+		super(ClassConstants.CONSTANT_Utf8);
+		this.setString(s);
+		this.refCount = 1;
+	}
 
+	/**
+	 * Decrement the reference count, blanking the entry if no more references.
+	 * 
+	 * @throws ClassFileException
+	 */
+	@Override
+	public void decRefCount() throws ClassFileException {
+		super.decRefCount();
+		if (this.refCount == 0) {
+			this.clearString();
+		}
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     */
-    protected Utf8CpInfo()
-    {
-        super(ClassConstants.CONSTANT_Utf8);
-    }
+	/**
+	 * Return UTF8 data as a String.
+	 */
+	public String getString() {
+		if (this.utf8string == null) {
+			try {
+				this.utf8string = new String(this.bytes, "UTF8");
+			} catch (final UnsupportedEncodingException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return this.utf8string;
+	}
 
-    /**
-     * Constructor used when appending fresh Utf8 entries to the constant pool.
-     * 
-     * @param s
-     */
-    public Utf8CpInfo(String s)
-    {
-        super(ClassConstants.CONSTANT_Utf8);
-        this.setString(s);
-        this.refCount = 1;
-    }
+	/**
+	 * Set UTF8 data as String.
+	 * 
+	 * @param str
+	 */
+	public void setString(final String str) {
+		this.utf8string = str;
+		try {
+			this.bytes = str.getBytes("UTF8");
+		} catch (final UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+		this.u2length = this.bytes.length;
+	}
 
-    /**
-     * Decrement the reference count, blanking the entry if no more references.
-     * 
-     * @throws ClassFileException
-     */
-    @Override
-    public void decRefCount() throws ClassFileException
-    {
-        super.decRefCount();
-        if (this.refCount == 0)
-        {
-            this.clearString();
-        }
-    }
+	/**
+	 * Set the UTF8 data to empty.
+	 */
+	public void clearString() {
+		this.u2length = 0;
+		this.bytes = new byte[0];
+		this.utf8string = null;
+		this.getString();
+	}
 
-    /**
-     * Return UTF8 data as a String.
-     */
-    public String getString()
-    {
-        if (this.utf8string == null)
-        {
-            try
-            {
-                this.utf8string = new String(this.bytes, "UTF8");
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-        return this.utf8string;
-    }
+	/**
+	 * Read the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		this.u2length = din.readUnsignedShort();
+		this.bytes = new byte[this.u2length];
+		din.readFully(this.bytes);
+		this.getString();
+	}
 
-    /**
-     * Set UTF8 data as String.
-     * 
-     * @param str
-     */
-    public void setString(String str)
-    {
-        this.utf8string = str;
-        try
-        {
-            this.bytes = str.getBytes("UTF8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new RuntimeException(e);
-        }
-        this.u2length = this.bytes.length;
-    }
-
-    /**
-     * Set the UTF8 data to empty.
-     */
-    public void clearString()
-    {
-        this.u2length = 0;
-        this.bytes = new byte[0];
-        this.utf8string = null;
-        this.getString();
-    }
-
-    /**
-     * Read the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        this.u2length = din.readUnsignedShort();
-        this.bytes = new byte[this.u2length];
-        din.readFully(this.bytes);
-        this.getString();
-    }
-
-    /**
-     * Write the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeShort(this.u2length);
-        if (this.bytes.length > 0)
-        {
-            dout.write(this.bytes);
-        }
-    }
+	/**
+	 * Write the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeShort(this.u2length);
+		if (this.bytes.length > 0) {
+			dout.write(this.bytes);
+		}
+	}
 }

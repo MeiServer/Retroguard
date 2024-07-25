@@ -19,39 +19,30 @@
 
 package com.rl.obf;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
-
-import com.rl.obf.classfile.*;
-import com.rl.util.*;
+import java.util.Collections;
 
 /**
- * Placeholder class -- used to represent a class which has inner classes, before the class itself has been encountered.
- * 
+ * Placeholder class -- used to represent a class which has inner classes,
+ * before the class itself has been encountered.
+ *
  * @author Mark Welsh
  */
-public class PlaceholderCl extends Cl
-{
-    // Constants -------------------------------------------------------------
+public class PlaceholderCl extends Cl {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
 
-    // Fields ----------------------------------------------------------------
+	// Class Methods ---------------------------------------------------------
 
-
-    // Class Methods ---------------------------------------------------------
-
-
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param parent
-     * @param isInnerClass
-     * @param name
-     */
-    public PlaceholderCl(TreeItem parent, boolean isInnerClass, String name)
-    {
-        super(parent, isInnerClass, name, null, Collections.<String>emptyList(), 0);
-    }
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param parent
+	 * @param isInnerClass
+	 * @param name
+	 */
+	public PlaceholderCl(final TreeItem parent, final boolean isInnerClass, final String name) {
+		super(parent, isInnerClass, name, null, Collections.<String>emptyList(), 0);
+	}
 }

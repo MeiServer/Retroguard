@@ -19,51 +19,44 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.IOException;
 
 /**
  * Representation of a field from a class-file.
- * 
+ *
  * @author Mark Welsh
  */
-public class FieldInfo extends ClassItemInfo
-{
-    // Constants -------------------------------------------------------------
+public class FieldInfo extends ClassItemInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
 
-    // Fields ----------------------------------------------------------------
+	// Class Methods ---------------------------------------------------------
+	/**
+	 * Create a new FieldInfo from the file format data in the DataInput stream.
+	 * 
+	 * @param din
+	 * @param cf
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	public static FieldInfo create(final DataInput din, final ClassFile cf) throws IOException, ClassFileException {
+		if (din == null) {
+			throw new IOException("No input stream was provided.");
+		}
+		final FieldInfo fi = new FieldInfo(cf);
+		fi.read(din);
+		return fi;
+	}
 
-
-    // Class Methods ---------------------------------------------------------
-    /**
-     * Create a new FieldInfo from the file format data in the DataInput stream.
-     * 
-     * @param din
-     * @param cf
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    public static FieldInfo create(DataInput din, ClassFile cf) throws IOException, ClassFileException
-    {
-        if (din == null)
-        {
-            throw new IOException("No input stream was provided.");
-        }
-        FieldInfo fi = new FieldInfo(cf);
-        fi.read(din);
-        return fi;
-    }
-
-
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param cf
-     */
-    protected FieldInfo(ClassFile cf)
-    {
-        super(cf);
-    }
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param cf
+	 */
+	protected FieldInfo(final ClassFile cf) {
+		super(cf);
+	}
 }

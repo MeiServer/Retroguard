@@ -19,44 +19,36 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
-
 /**
  * Representation of an attribute.
- * 
+ *
  * @author Mark Welsh
  */
-public class RuntimeVisibleParameterAnnotationsAttrInfo extends ParameterAnnotationsAttrInfo
-{
-    // Constants -------------------------------------------------------------
+public class RuntimeVisibleParameterAnnotationsAttrInfo extends ParameterAnnotationsAttrInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
 
-    // Fields ----------------------------------------------------------------
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param cf
+	 * @param attrNameIndex
+	 * @param attrLength
+	 */
+	protected RuntimeVisibleParameterAnnotationsAttrInfo(final ClassFile cf, final int attrNameIndex,
+			final int attrLength) {
+		super(cf, attrNameIndex, attrLength);
+	}
 
-    // Class Methods ---------------------------------------------------------
-
-
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param cf
-     * @param attrNameIndex
-     * @param attrLength
-     */
-    protected RuntimeVisibleParameterAnnotationsAttrInfo(ClassFile cf, int attrNameIndex, int attrLength)
-    {
-        super(cf, attrNameIndex, attrLength);
-    }
-
-    /**
-     * Return the String name of the attribute.
-     */
-    @Override
-    protected String getAttrName()
-    {
-        return ClassConstants.ATTR_RuntimeVisibleParameterAnnotations;
-    }
+	/**
+	 * Return the String name of the attribute.
+	 */
+	@Override
+	protected String getAttrName() {
+		return ClassConstants.ATTR_RuntimeVisibleParameterAnnotations;
+	}
 }

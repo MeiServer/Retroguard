@@ -1,36 +1,28 @@
 package com.rl.obf;
 
-import java.io.*;
-import java.util.*;
+public class RGSException extends Exception {
+	private static final long serialVersionUID = 1L;
 
-public class RGSException extends Exception
-{
-    private static final long serialVersionUID = 1L;
+	/**
+	 * Constructor
+	 */
+	public RGSException() {
+	}
 
-    /**
-     * Constructor
-     */
-    public RGSException()
-    {
-    }
+	/**
+	 * Constructor
+	 * 
+	 * @param message
+	 */
+	public RGSException(final String message) {
+		super(message);
+	}
 
-    /**
-     * Constructor
-     * 
-     * @param message
-     */
-    public RGSException(String message)
-    {
-        super(message);
-    }
+	public RGSException(final Throwable cause) {
+		super(cause);
+	}
 
-    public RGSException(Throwable cause)
-    {
-        super(cause);
-    }
-
-    public RGSException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+	public RGSException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
 }

@@ -2,7 +2,7 @@
  * RetroGuard -- an obfuscation package for Java classfiles.
  *
  * Copyright (c) 1998-2006 Mark Welsh (markw@retrologic.com)
- * 
+ *
  * This class was created by r3qu13m (r3qu13m.minecraft@gmail.com)
  *
  * This program can be redistributed and/or modified under the terms of the
@@ -20,29 +20,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class BootStrapMethod
-{
-    private int factory;
-    private final List<Integer> bsmArgs = new ArrayList<Integer>();
+public class BootStrapMethod {
+	private int factory;
+	private final List<Integer> bsmArgs = new ArrayList<>();
 
-    public void setFactory(final int factory)
-    {
-        this.factory = factory;
-    }
+	public void setFactory(final int factory) {
+		this.factory = factory;
+	}
 
-    public void addArgument(final int arg)
-    {
-        this.bsmArgs.add(arg);
-    }
+	public void addArgument(final int arg) {
+		this.bsmArgs.add(arg);
+	}
 
-    public List<Integer> getArguments()
-    {
-        return Collections.unmodifiableList(this.bsmArgs);
-    }
+	public List<Integer> getArguments() {
+		return Collections.unmodifiableList(this.bsmArgs);
+	}
 
-    public int getFactory()
-    {
-        return this.factory;
-    }
+	public int getFactory() {
+		return this.factory;
+	}
 
 }

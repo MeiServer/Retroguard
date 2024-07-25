@@ -19,59 +19,53 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of a 'long' entry in the ConstantPool (takes up two indices).
- * 
+ *
  * @author Mark Welsh
  */
-public class LongCpInfo extends CpInfo
-{
-    // Constants -------------------------------------------------------------
+public class LongCpInfo extends CpInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u4highBytes;
+	private int u4lowBytes;
 
-    // Fields ----------------------------------------------------------------
-    private int u4highBytes;
-    private int u4lowBytes;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 */
+	protected LongCpInfo() {
+		super(ClassConstants.CONSTANT_Long);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Read the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		this.u4highBytes = din.readInt();
+		this.u4lowBytes = din.readInt();
+	}
 
-
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     */
-    protected LongCpInfo()
-    {
-        super(ClassConstants.CONSTANT_Long);
-    }
-
-    /**
-     * Read the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        this.u4highBytes = din.readInt();
-        this.u4lowBytes = din.readInt();
-    }
-
-    /**
-     * Write the 'info' data following the u1tag byte.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeInt(this.u4highBytes);
-        dout.writeInt(this.u4lowBytes);
-    }
+	/**
+	 * Write the 'info' data following the u1tag byte.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeInt(this.u4highBytes);
+		dout.writeInt(this.u4lowBytes);
+	}
 }

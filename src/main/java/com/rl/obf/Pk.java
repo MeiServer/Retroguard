@@ -19,166 +19,146 @@
 
 package com.rl.obf;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import com.rl.NameProvider;
-import com.rl.obf.classfile.*;
-import com.rl.util.*;
+import com.rl.obf.classfile.ClassFileException;
 
 /**
  * Tree item representing a package.
- * 
+ *
  * @author Mark Welsh
  */
-public class Pk extends PkCl
-{
-    // Constants -------------------------------------------------------------
+public class Pk extends PkCl {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	/**
+	 * Owns a list of sub-package levels
+	 */
+	private Map<String, Pk> pks = new HashMap<>();
 
-    // Fields ----------------------------------------------------------------
-    /**
-     * Owns a list of sub-package levels
-     */
-    private Map<String, Pk> pks = new HashMap<String, Pk>();
+	// Class Methods ---------------------------------------------------------
+	/**
+	 * Create the root entry for a tree.
+	 * 
+	 * @param classTree
+	 */
+	public static Pk createRoot(final ClassTree classTree) {
+		return new Pk(classTree);
+	}
 
-    // Class Methods ---------------------------------------------------------
-    /**
-     * Create the root entry for a tree.
-     * 
-     * @param classTree
-     */
-    public static Pk createRoot(ClassTree classTree)
-    {
-        return new Pk(classTree);
-    }
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor for default package level.
+	 * 
+	 * @param classTree
+	 */
+	public Pk(final ClassTree classTree) {
+		this(null, "");
+		this.classTree = classTree;
+	}
 
+	/**
+	 * Constructor for regular package levels.
+	 * 
+	 * @param parent
+	 * @param name
+	 */
+	public Pk(final TreeItem parent, final String name) {
+		super(parent, name);
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor for default package level.
-     * 
-     * @param classTree
-     */
-    public Pk(ClassTree classTree)
-    {
-        this(null, "");
-        this.classTree = classTree;
-    }
+		if (NameProvider.oldHash) {
+			this.pks = new Hashtable<>();
+		}
 
-    /**
-     * Constructor for regular package levels.
-     * 
-     * @param parent
-     * @param name
-     */
-    public Pk(TreeItem parent, String name)
-    {
-        super(parent, name);
+		if (parent == null && !name.equals("")) {
+			throw new RuntimeException("Internal error: only the default package has no parent");
+		} else if (parent != null && name.equals("")) {
+			throw new RuntimeException("Internal error: the default package cannot have a parent");
+		}
+	}
 
-        if (NameProvider.oldHash)
-        {
-            this.pks = new Hashtable<String, Pk>();
-        }
+	/**
+	 * Get a package level by name.
+	 * 
+	 * @param name
+	 */
+	public Pk getPackage(final String name) {
+		return this.pks.get(name);
+	}
 
-        if ((parent == null) && !name.equals(""))
-        {
-            throw new RuntimeException("Internal error: only the default package has no parent");
-        }
-        else if ((parent != null) && name.equals(""))
-        {
-            throw new RuntimeException("Internal error: the default package cannot have a parent");
-        }
-    }
+	/**
+	 * Get a {@code Collection<Pk>} of packages.
+	 */
+	public Collection<Pk> getPackages() {
+		return this.pks.values();
+	}
 
-    /**
-     * Get a package level by name.
-     * 
-     * @param name
-     */
-    public Pk getPackage(String name)
-    {
-        return this.pks.get(name);
-    }
+	/**
+	 * Add a sub-package level.
+	 * 
+	 * @param name
+	 */
+	public Pk addPackage(final String name) {
+		Pk pk = this.getPackage(name);
+		if (pk == null) {
+			pk = new Pk(this, name);
+			this.pks.put(name, pk);
+		}
+		return pk;
+	}
 
-    /**
-     * Get a {@code Collection<Pk>} of packages.
-     */
-    public Collection<Pk> getPackages()
-    {
-        return this.pks.values();
-    }
+	/**
+	 * Add a class.
+	 */
+	@Override
+	public Cl addClass(final String name, final String superName, final List<String> interfaceNames, final int access) {
+		return this.addClass(false, name, superName, interfaceNames, access);
+	}
 
-    /**
-     * Add a sub-package level.
-     * 
-     * @param name
-     */
-    public Pk addPackage(String name)
-    {
-        Pk pk = this.getPackage(name);
-        if (pk == null)
-        {
-            pk = new Pk(this, name);
-            this.pks.put(name, pk);
-        }
-        return pk;
-    }
+	/**
+	 * Add a placeholder class.
+	 */
+	@Override
+	public Cl addPlaceholderClass(final String name) {
+		return this.addPlaceholderClass(false, name);
+	}
 
-    /**
-     * Add a class.
-     */
-    @Override
-    public Cl addClass(String name, String superName, List<String> interfaceNames, int access)
-    {
-        return this.addClass(false, name, superName, interfaceNames, access);
-    }
+	/**
+	 * Generate unique obfuscated names for this namespace.
+	 * 
+	 * @throws ClassFileException
+	 */
+	@Override
+	public void generateNames() throws ClassFileException {
+		super.generateNames();
+		PkCl.generateNames(this.pks);
+	}
 
-    /**
-     * Add a placeholder class.
-     */
-    @Override
-    public Cl addPlaceholderClass(String name)
-    {
-        return this.addPlaceholderClass(false, name);
-    }
+	/**
+	 * Construct and return the full obfuscated name of the entry.
+	 */
+	@Override
+	public String getFullOutName() {
+		final String repackageName = this.getRepackageName();
 
-    /**
-     * Generate unique obfuscated names for this namespace.
-     * 
-     * @throws ClassFileException
-     */
-    @Override
-    public void generateNames() throws ClassFileException
-    {
-        super.generateNames();
-        PkCl.generateNames(this.pks);
-    }
+		if (repackageName != null) {
+			return repackageName;
+		}
 
-    /**
-     * Construct and return the full obfuscated name of the entry.
-     */
-    @Override
-    public String getFullOutName()
-    {
-        String repackageName = this.getRepackageName();
+		// for top level packages we ignore the default package name
+		final TreeItem parentTreeItem = this.parent;
+		if (parentTreeItem != null) {
+			if (parentTreeItem.parent == null) {
+				return this.getOutName();
+			}
+		}
 
-        if (repackageName != null)
-        {
-            return repackageName;
-        }
-
-        // for top level packages we ignore the default package name
-        TreeItem parentTreeItem = this.parent;
-        if (parentTreeItem != null)
-        {
-            if (parentTreeItem.parent == null)
-            {
-                return this.getOutName();
-            }
-        }
-
-        return super.getFullOutName();
-    }
+		return super.getFullOutName();
+	}
 }

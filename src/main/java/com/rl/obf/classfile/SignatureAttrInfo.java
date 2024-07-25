@@ -19,111 +19,102 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of an attribute.
  *
  * @author Mark Welsh
  */
-public class SignatureAttrInfo extends AttrInfo
-{
-    // Constants -------------------------------------------------------------
+public class SignatureAttrInfo extends AttrInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u2signatureIndex;
 
-    // Fields ----------------------------------------------------------------
-    private int u2signatureIndex;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 *
+	 * @param cf
+	 * @param attrNameIndex
+	 * @param attrLength
+	 */
+	protected SignatureAttrInfo(final ClassFile cf, final int attrNameIndex, final int attrLength) {
+		super(cf, attrNameIndex, attrLength);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Return the String name of the attribute; over-ride this in sub-classes.
+	 */
+	@Override
+	protected String getAttrName() {
+		return ClassConstants.ATTR_Signature;
+	}
 
+	/**
+	 * Check for Utf8 references in the 'info' data to the constant pool and mark
+	 * them.
+	 *
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void markUtf8RefsInInfo(final ConstantPool pool) throws ClassFileException {
+		pool.incRefCount(this.u2signatureIndex);
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     *
-     * @param cf
-     * @param attrNameIndex
-     * @param attrLength
-     */
-    protected SignatureAttrInfo(ClassFile cf, int attrNameIndex, int attrLength)
-    {
-        super(cf, attrNameIndex, attrLength);
-    }
+	/**
+	 * Read the data following the header.
+	 *
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		this.u2signatureIndex = din.readUnsignedShort();
+	}
 
-    /**
-     * Return the String name of the attribute; over-ride this in sub-classes.
-     */
-    @Override
-    protected String getAttrName()
-    {
-        return ClassConstants.ATTR_Signature;
-    }
+	/**
+	 * Export data following the header to a DataOutput stream.
+	 *
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	public void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeShort(this.u2signatureIndex);
+	}
 
-    /**
-     * Check for Utf8 references in the 'info' data to the constant pool and mark them.
-     *
-     * @throws ClassFileException
-     */
-    @Override
-    protected void markUtf8RefsInInfo(ConstantPool pool) throws ClassFileException
-    {
-        pool.incRefCount(this.u2signatureIndex);
-    }
+	/**
+	 * Do necessary name remapping.
+	 *
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void remap(final ClassFile cf, final NameMapper nm) throws ClassFileException {
+		final String oldDesc = cf.getUtf8(this.u2signatureIndex);
+		String newDesc;
+		switch (this.source) {
+		case CLASS:
+			newDesc = nm.mapSignatureClass(oldDesc);
+			break;
 
-    /**
-     * Read the data following the header.
-     *
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        this.u2signatureIndex = din.readUnsignedShort();
-    }
+		case METHOD:
+			newDesc = nm.mapSignatureMethod(oldDesc);
+			break;
 
-    /**
-     * Export data following the header to a DataOutput stream.
-     *
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    public void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeShort(this.u2signatureIndex);
-    }
+		case FIELD:
+			newDesc = nm.mapSignatureField(oldDesc);
+			break;
 
-    /**
-     * Do necessary name remapping.
-     *
-     * @throws ClassFileException
-     */
-    @Override
-    protected void remap(ClassFile cf, NameMapper nm) throws ClassFileException
-    {
-        String oldDesc = cf.getUtf8(this.u2signatureIndex);
-        String newDesc;
-        switch (this.source)
-        {
-            case CLASS:
-                newDesc = nm.mapSignatureClass(oldDesc);
-                break;
+		default:
+			throw new ClassFileException("Invalid attribute source");
+		}
 
-            case METHOD:
-                newDesc = nm.mapSignatureMethod(oldDesc);
-                break;
-
-            case FIELD:
-                newDesc = nm.mapSignatureField(oldDesc);
-                break;
-
-            default:
-                throw new ClassFileException("Invalid attribute source");
-        }
-
-        this.u2signatureIndex = cf.remapUtf8To(newDesc, this.u2signatureIndex);
-    }
+		this.u2signatureIndex = cf.remapUtf8To(newDesc, this.u2signatureIndex);
+	}
 }

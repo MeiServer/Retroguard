@@ -19,78 +19,66 @@
 
 package com.rl.obf;
 
-import java.io.*;
-import java.util.*;
-
 /**
- * Java 'simple name' -- a class name or a component of a package name, along with the type of this simple name.
- * 
+ * Java 'simple name' -- a class name or a component of a package name, along
+ * with the type of this simple name.
+ *
  * @author Mark Welsh
  */
-public class SimpleName
-{
-    // Constants -------------------------------------------------------------
+public class SimpleName {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private final String name;
+	private boolean isAsPackage;
 
-    // Fields ----------------------------------------------------------------
-    private String name;
-    private boolean isAsPackage;
+	// Class methods ---------------------------------------------------------
 
+	// Instance Methods ---------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param simpleName
+	 */
+	public SimpleName(final String simpleName) {
+		this.name = simpleName;
+		this.isAsPackage = true;
+	}
 
-    // Class methods ---------------------------------------------------------
+	/**
+	 * Set simple name as package level.
+	 */
+	public SimpleName setAsPackage() {
+		this.isAsPackage = true;
+		return this;
+	}
 
+	/**
+	 * Set simple name as class level.
+	 */
+	public SimpleName setAsClass() {
+		this.isAsPackage = false;
+		return this;
+	}
 
-    // Instance Methods ---------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param simpleName
-     */
-    public SimpleName(String simpleName)
-    {
-        this.name = simpleName;
-        this.isAsPackage = true;
-    }
+	/**
+	 * Is this a package level simple name?
+	 */
+	public boolean isAsPackage() {
+		return this.isAsPackage;
+	}
 
-    /**
-     * Set simple name as package level.
-     */
-    public SimpleName setAsPackage()
-    {
-        this.isAsPackage = true;
-        return this;
-    }
+	/**
+	 * Is this a class level simple name?
+	 */
+	public boolean isAsClass() {
+		return !this.isAsPackage;
+	}
 
-    /**
-     * Set simple name as class level.
-     */
-    public SimpleName setAsClass()
-    {
-        this.isAsPackage = false;
-        return this;
-    }
-
-    /**
-     * Is this a package level simple name?
-     */
-    public boolean isAsPackage()
-    {
-        return this.isAsPackage;
-    }
-
-    /**
-     * Is this a class level simple name?
-     */
-    public boolean isAsClass()
-    {
-        return !this.isAsPackage;
-    }
-
-    /**
-     * Return the simple name.
-     */
-    public String getName()
-    {
-        return this.name;
-    }
+	/**
+	 * Return the simple name.
+	 */
+	public String getName() {
+		return this.name;
+	}
 }

@@ -19,31 +19,23 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
-
 /**
  * Representation of a 'interfacemethodref' entry in the ConstantPool.
- * 
+ *
  * @author Mark Welsh
  */
-public class InterfaceMethodrefCpInfo extends RefCpInfo
-{
-    // Constants -------------------------------------------------------------
+public class InterfaceMethodrefCpInfo extends RefCpInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
 
-    // Fields ----------------------------------------------------------------
+	// Class Methods ---------------------------------------------------------
 
-
-    // Class Methods ---------------------------------------------------------
-
-
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     */
-    protected InterfaceMethodrefCpInfo()
-    {
-        super(ClassConstants.CONSTANT_InterfaceMethodref);
-    }
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 */
+	protected InterfaceMethodrefCpInfo() {
+		super(ClassConstants.CONSTANT_InterfaceMethodref);
+	}
 }

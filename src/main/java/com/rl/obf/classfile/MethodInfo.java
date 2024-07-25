@@ -19,51 +19,44 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.IOException;
 
 /**
  * Representation of a method from a class-file.
- * 
+ *
  * @author Mark Welsh
  */
-public class MethodInfo extends ClassItemInfo
-{
-    // Constants -------------------------------------------------------------
+public class MethodInfo extends ClassItemInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
 
-    // Fields ----------------------------------------------------------------
+	// Class Methods ---------------------------------------------------------
+	/**
+	 * Create a new MethodInfo from the file format data in the DataInput stream.
+	 * 
+	 * @param din
+	 * @param cf
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	public static MethodInfo create(final DataInput din, final ClassFile cf) throws IOException, ClassFileException {
+		if (din == null) {
+			throw new IOException("No input stream was provided.");
+		}
+		final MethodInfo mi = new MethodInfo(cf);
+		mi.read(din);
+		return mi;
+	}
 
-
-    // Class Methods ---------------------------------------------------------
-    /**
-     * Create a new MethodInfo from the file format data in the DataInput stream.
-     * 
-     * @param din
-     * @param cf
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    public static MethodInfo create(DataInput din, ClassFile cf) throws IOException, ClassFileException
-    {
-        if (din == null)
-        {
-            throw new IOException("No input stream was provided.");
-        }
-        MethodInfo mi = new MethodInfo(cf);
-        mi.read(din);
-        return mi;
-    }
-
-
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param cf
-     */
-    protected MethodInfo(ClassFile cf)
-    {
-        super(cf);
-    }
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param cf
+	 */
+	protected MethodInfo(final ClassFile cf) {
+		super(cf);
+	}
 }

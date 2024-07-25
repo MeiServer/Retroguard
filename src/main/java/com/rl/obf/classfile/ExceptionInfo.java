@@ -19,71 +19,64 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of an Exception table entry.
- * 
+ *
  * @author Mark Welsh
  */
-public class ExceptionInfo
-{
-    // Constants -------------------------------------------------------------
-    public static final int CONSTANT_FIELD_SIZE = 8;
+public class ExceptionInfo {
+	// Constants -------------------------------------------------------------
+	public static final int CONSTANT_FIELD_SIZE = 8;
 
+	// Fields ----------------------------------------------------------------
+	private int u2startpc;
+	private int u2endpc;
+	private int u2handlerpc;
+	private int u2catchType;
 
-    // Fields ----------------------------------------------------------------
-    private int u2startpc;
-    private int u2endpc;
-    private int u2handlerpc;
-    private int u2catchType;
+	// Class Methods ---------------------------------------------------------
+	/**
+	 * @param din
+	 * @throws IOException
+	 */
+	public static ExceptionInfo create(final DataInput din) throws IOException {
+		final ExceptionInfo ei = new ExceptionInfo();
+		ei.read(din);
+		return ei;
+	}
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Private constructor
+	 */
+	private ExceptionInfo() {
+	}
 
-    // Class Methods ---------------------------------------------------------
-    /**
-     * @param din
-     * @throws IOException
-     */
-    public static ExceptionInfo create(DataInput din) throws IOException
-    {
-        ExceptionInfo ei = new ExceptionInfo();
-        ei.read(din);
-        return ei;
-    }
+	/**
+	 * @param din
+	 * @throws IOException
+	 */
+	private void read(final DataInput din) throws IOException {
+		this.u2startpc = din.readUnsignedShort();
+		this.u2endpc = din.readUnsignedShort();
+		this.u2handlerpc = din.readUnsignedShort();
+		this.u2catchType = din.readUnsignedShort();
+	}
 
-
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Private constructor
-     */
-    private ExceptionInfo()
-    {
-    }
-
-    /**
-     * @param din
-     * @throws IOException
-     */
-    private void read(DataInput din) throws IOException
-    {
-        this.u2startpc = din.readUnsignedShort();
-        this.u2endpc = din.readUnsignedShort();
-        this.u2handlerpc = din.readUnsignedShort();
-        this.u2catchType = din.readUnsignedShort();
-    }
-
-    /**
-     * Export the representation to a DataOutput stream.
-     * 
-     * @param dout
-     * @throws IOException
-     */
-    public void write(DataOutput dout) throws IOException
-    {
-        dout.writeShort(this.u2startpc);
-        dout.writeShort(this.u2endpc);
-        dout.writeShort(this.u2handlerpc);
-        dout.writeShort(this.u2catchType);
-    }
+	/**
+	 * Export the representation to a DataOutput stream.
+	 * 
+	 * @param dout
+	 * @throws IOException
+	 */
+	public void write(final DataOutput dout) throws IOException {
+		dout.writeShort(this.u2startpc);
+		dout.writeShort(this.u2endpc);
+		dout.writeShort(this.u2handlerpc);
+		dout.writeShort(this.u2catchType);
+	}
 }

@@ -19,139 +19,122 @@
 
 package com.rl.util.rfc822;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * An RFC822 section is a list of 'header's (tag/value pairs).
- * 
+ *
  * @author Mark Welsh
  */
-public class Section implements Iterable<Header>
-{
-    // Constants -------------------------------------------------------------
+public class Section implements Iterable<Header> {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private final List<Header> headers = new ArrayList<>();
 
-    // Fields ----------------------------------------------------------------
-    private List<Header> headers = new ArrayList<Header>();
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Blank section.
+	 */
+	public Section() {
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Append a header to this section.
+	 * 
+	 * @param header
+	 */
+	public void add(final Header header) {
+		this.headers.add(header);
+	}
 
+	/**
+	 * Append a header to this section.
+	 * 
+	 * @param tag
+	 * @param value
+	 */
+	public void add(final String tag, final String value) {
+		this.add(new Header(tag, value));
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Blank section.
-     */
-    public Section()
-    {
-    }
+	/**
+	 * Return an Iterator of headers.
+	 */
+	@Override
+	public Iterator<Header> iterator() {
+		return this.headers.iterator();
+	}
 
-    /**
-     * Append a header to this section.
-     * 
-     * @param header
-     */
-    public void add(Header header)
-    {
-        this.headers.add(header);
-    }
+	/**
+	 * Does the section contain a header matching the specified one?
+	 * 
+	 * @param queryHeader
+	 */
+	public boolean hasHeader(final Header queryHeader) {
+		if (queryHeader != null) {
+			for (final Header header : this.headers) {
+				if (queryHeader.equals(header)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-    /**
-     * Append a header to this section.
-     * 
-     * @param tag
-     * @param value
-     */
-    public void add(String tag, String value)
-    {
-        this.add(new Header(tag, value));
-    }
+	/**
+	 * Find a header matching the specified tag, or null if none.
+	 * 
+	 * @param tag
+	 */
+	public Header findTag(final String tag) {
+		// Check params
+		if (tag == null) {
+			return null;
+		}
 
-    /**
-     * Return an Iterator of headers.
-     */
-    @Override
-    public Iterator<Header> iterator()
-    {
-        return this.headers.iterator();
-    }
+		// For now, do linear search of headers
+		for (final Header header : this.headers) {
+			if (tag.equals(header.getTag())) {
+				// Found
+				return header;
+			}
+		}
 
-    /**
-     * Does the section contain a header matching the specified one?
-     * 
-     * @param queryHeader
-     */
-    public boolean hasHeader(Header queryHeader)
-    {
-        if (queryHeader != null)
-        {
-            for (Header header : this.headers)
-            {
-                if (queryHeader.equals(header))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+		// Not found
+		return null;
+	}
 
-    /**
-     * Find a header matching the specified tag, or null if none.
-     * 
-     * @param tag
-     */
-    public Header findTag(String tag)
-    {
-        // Check params
-        if (tag == null)
-        {
-            return null;
-        }
+	/**
+	 * Print String rep of this object to a java.io.Writer.
+	 * 
+	 * @param writer
+	 * @throws IOException
+	 */
+	public void writeString(final Writer writer) throws IOException {
+		for (final Header header : this.headers) {
+			header.writeString(writer);
+		}
+		writer.write("\015\012");
+	}
 
-        // For now, do linear search of headers
-        for (Header header : this.headers)
-        {
-            if (tag.equals(header.getTag()))
-            {
-                // Found
-                return header;
-            }
-        }
-
-        // Not found
-        return null;
-    }
-
-    /**
-     * Print String rep of this object to a java.io.Writer.
-     * 
-     * @param writer
-     * @throws IOException
-     */
-    public void writeString(Writer writer) throws IOException
-    {
-        for (Header header : this.headers)
-        {
-            header.writeString(writer);
-        }
-        writer.write("\015\012");
-    }
-
-    /**
-     * Return String rep of this object.
-     */
-    @Override
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder();
-        for (Header header : this.headers)
-        {
-            sb.append(header.toString());
-            sb.append("\015\012");
-        }
-        sb.append("\015\012");
-        return sb.toString();
-    }
+	/**
+	 * Return String rep of this object.
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		for (final Header header : this.headers) {
+			sb.append(header.toString());
+			sb.append("\015\012");
+		}
+		sb.append("\015\012");
+		return sb.toString();
+	}
 }

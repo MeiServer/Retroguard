@@ -19,70 +19,63 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of an attribute.
- * 
+ *
  * @author Mark Welsh
  */
-public class SyntheticAttrInfo extends AttrInfo
-{
-    // Constants -------------------------------------------------------------
+public class SyntheticAttrInfo extends AttrInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
 
-    // Fields ----------------------------------------------------------------
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param cf
+	 * @param attrNameIndex
+	 * @param attrLength
+	 */
+	protected SyntheticAttrInfo(final ClassFile cf, final int attrNameIndex, final int attrLength) {
+		super(cf, attrNameIndex, attrLength);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Return the String name of the attribute.
+	 */
+	@Override
+	protected String getAttrName() {
+		return ClassConstants.ATTR_Synthetic;
+	}
 
+	/**
+	 * Read the data following the header.
+	 * 
+	 * @param din
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		// do nothing
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param cf
-     * @param attrNameIndex
-     * @param attrLength
-     */
-    protected SyntheticAttrInfo(ClassFile cf, int attrNameIndex, int attrLength)
-    {
-        super(cf, attrNameIndex, attrLength);
-    }
-
-    /**
-     * Return the String name of the attribute.
-     */
-    @Override
-    protected String getAttrName()
-    {
-        return ClassConstants.ATTR_Synthetic;
-    }
-
-    /**
-     * Read the data following the header.
-     * 
-     * @param din
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        // do nothing
-    }
-
-    /**
-     * Export data following the header to a DataOutput stream.
-     * 
-     * @param dout
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    public void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        // do nothing
-    }
+	/**
+	 * Export data following the header to a DataOutput stream.
+	 * 
+	 * @param dout
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	public void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		// do nothing
+	}
 }

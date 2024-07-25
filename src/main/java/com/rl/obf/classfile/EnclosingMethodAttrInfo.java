@@ -19,100 +19,90 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * Representation of an attribute.
- * 
+ *
  * @author Mark Welsh
  */
-public class EnclosingMethodAttrInfo extends AttrInfo
-{
-    // Constants -------------------------------------------------------------
+public class EnclosingMethodAttrInfo extends AttrInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private int u2classIndex;
+	private int u2methodIndex;
 
-    // Fields ----------------------------------------------------------------
-    private int u2classIndex;
-    private int u2methodIndex;
+	// Class Methods ---------------------------------------------------------
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param cf
+	 * @param attrNameIndex
+	 * @param attrLength
+	 */
+	protected EnclosingMethodAttrInfo(final ClassFile cf, final int attrNameIndex, final int attrLength) {
+		super(cf, attrNameIndex, attrLength);
+	}
 
-    // Class Methods ---------------------------------------------------------
+	/**
+	 * Return the String name of the attribute.
+	 */
+	@Override
+	protected String getAttrName() {
+		return ClassConstants.ATTR_EnclosingMethod;
+	}
 
+	/**
+	 * Return the class index into the constant pool.
+	 */
+	protected int getClassIndex() {
+		return this.u2classIndex;
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Constructor
-     * 
-     * @param cf
-     * @param attrNameIndex
-     * @param attrLength
-     */
-    protected EnclosingMethodAttrInfo(ClassFile cf, int attrNameIndex, int attrLength)
-    {
-        super(cf, attrNameIndex, attrLength);
-    }
+	/**
+	 * Return the method index into the constant pool.
+	 */
+	protected int getMethodIndex() {
+		return this.u2methodIndex;
+	}
 
-    /**
-     * Return the String name of the attribute.
-     */
-    @Override
-    protected String getAttrName()
-    {
-        return ClassConstants.ATTR_EnclosingMethod;
-    }
+	/**
+	 * Read the data following the header.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	protected void readInfo(final DataInput din) throws IOException, ClassFileException {
+		this.u2classIndex = din.readUnsignedShort();
+		this.u2methodIndex = din.readUnsignedShort();
+	}
 
-    /**
-     * Return the class index into the constant pool.
-     */
-    protected int getClassIndex()
-    {
-        return this.u2classIndex;
-    }
+	/**
+	 * Export data following the header to a DataOutput stream.
+	 * 
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	@Override
+	public void writeInfo(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeShort(this.u2classIndex);
+		dout.writeShort(this.u2methodIndex);
+	}
 
-    /**
-     * Return the method index into the constant pool.
-     */
-    protected int getMethodIndex()
-    {
-        return this.u2methodIndex;
-    }
-
-    /**
-     * Read the data following the header.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    protected void readInfo(DataInput din) throws IOException, ClassFileException
-    {
-        this.u2classIndex = din.readUnsignedShort();
-        this.u2methodIndex = din.readUnsignedShort();
-    }
-
-    /**
-     * Export data following the header to a DataOutput stream.
-     * 
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    @Override
-    public void writeInfo(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeShort(this.u2classIndex);
-        dout.writeShort(this.u2methodIndex);
-    }
-
-    /**
-     * Do necessary name remapping.
-     * 
-     * @param cf
-     * @param nm
-     */
-    @Override
-    protected void remap(ClassFile cf, NameMapper nm)
-    {
-        // No remap needed
-    }
+	/**
+	 * Do necessary name remapping.
+	 * 
+	 * @param cf
+	 * @param nm
+	 */
+	@Override
+	protected void remap(final ClassFile cf, final NameMapper nm) {
+		// No remap needed
+	}
 }

@@ -19,102 +19,91 @@
 
 package com.rl.obf.classfile;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Representation of an parameter annotations table entry.
- * 
+ *
  * @author Mark Welsh
  */
-public class ParameterAnnotationsInfo
-{
-    // Constants -------------------------------------------------------------
+public class ParameterAnnotationsInfo {
+	// Constants -------------------------------------------------------------
 
+	// Fields ----------------------------------------------------------------
+	private List<AnnotationInfo> annotationTable;
 
-    // Fields ----------------------------------------------------------------
-    private List<AnnotationInfo> annotationTable;
+	// Class Methods ---------------------------------------------------------
+	/**
+	 * @param din
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	public static ParameterAnnotationsInfo create(final DataInput din) throws IOException, ClassFileException {
+		final ParameterAnnotationsInfo pai = new ParameterAnnotationsInfo();
+		pai.read(din);
+		return pai;
+	}
 
+	// Instance Methods ------------------------------------------------------
+	/**
+	 * Private constructor
+	 */
+	private ParameterAnnotationsInfo() {
+	}
 
-    // Class Methods ---------------------------------------------------------
-    /**
-     * @param din
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    public static ParameterAnnotationsInfo create(DataInput din) throws IOException, ClassFileException
-    {
-        ParameterAnnotationsInfo pai = new ParameterAnnotationsInfo();
-        pai.read(din);
-        return pai;
-    }
+	/**
+	 * Check for Utf8 references to constant pool and mark them.
+	 * 
+	 * @param pool
+	 * @throws ClassFileException
+	 */
+	protected void markUtf8Refs(final ConstantPool pool) throws ClassFileException {
+		for (final AnnotationInfo a : this.annotationTable) {
+			a.markUtf8Refs(pool);
+		}
+	}
 
+	/**
+	 * @param din
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	private void read(final DataInput din) throws IOException, ClassFileException {
+		final int u2numAnnotations = din.readUnsignedShort();
+		this.annotationTable = new ArrayList<>(u2numAnnotations);
+		for (int i = 0; i < u2numAnnotations; i++) {
+			this.annotationTable.add(AnnotationInfo.create(din));
+		}
+	}
 
-    // Instance Methods ------------------------------------------------------
-    /**
-     * Private constructor
-     */
-    private ParameterAnnotationsInfo()
-    {
-    }
+	/**
+	 * Export the representation to a DataOutput stream.
+	 * 
+	 * @param dout
+	 * @throws IOException
+	 * @throws ClassFileException
+	 */
+	public void write(final DataOutput dout) throws IOException, ClassFileException {
+		dout.writeShort(this.annotationTable.size());
+		for (final AnnotationInfo a : this.annotationTable) {
+			a.write(dout);
+		}
+	}
 
-    /**
-     * Check for Utf8 references to constant pool and mark them.
-     * 
-     * @param pool
-     * @throws ClassFileException
-     */
-    protected void markUtf8Refs(ConstantPool pool) throws ClassFileException
-    {
-        for (AnnotationInfo a : this.annotationTable)
-        {
-            a.markUtf8Refs(pool);
-        }
-    }
-
-    /**
-     * @param din
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    private void read(DataInput din) throws IOException, ClassFileException
-    {
-        int u2numAnnotations = din.readUnsignedShort();
-        this.annotationTable = new ArrayList<AnnotationInfo>(u2numAnnotations);
-        for (int i = 0; i < u2numAnnotations; i++)
-        {
-            this.annotationTable.add(AnnotationInfo.create(din));
-        }
-    }
-
-    /**
-     * Export the representation to a DataOutput stream.
-     * 
-     * @param dout
-     * @throws IOException
-     * @throws ClassFileException
-     */
-    public void write(DataOutput dout) throws IOException, ClassFileException
-    {
-        dout.writeShort(this.annotationTable.size());
-        for (AnnotationInfo a : this.annotationTable)
-        {
-            a.write(dout);
-        }
-    }
-
-    /**
-     * Do necessary name remapping.
-     * 
-     * @param cf
-     * @param nm
-     * @throws ClassFileException
-     */
-    protected void remap(ClassFile cf, NameMapper nm) throws ClassFileException
-    {
-        for (AnnotationInfo a : this.annotationTable)
-        {
-            a.remap(cf, nm);
-        }
-    }
+	/**
+	 * Do necessary name remapping.
+	 * 
+	 * @param cf
+	 * @param nm
+	 * @throws ClassFileException
+	 */
+	protected void remap(final ClassFile cf, final NameMapper nm) throws ClassFileException {
+		for (final AnnotationInfo a : this.annotationTable) {
+			a.remap(cf, nm);
+		}
+	}
 }
