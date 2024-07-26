@@ -8,4 +8,4 @@ A fork of the Retroguard that modified by MCP teams
 * Fix some bugs found by the developers in @MeiServer
 
 ## License
-GPLv2. See a header of the each files. 
+GPLv2. See the header of the each files. 
